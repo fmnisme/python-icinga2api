@@ -1,10 +1,10 @@
 #Feature
 1. basic auth
 2. objects (list,create,update,delete) 
+3. actions
 
 #Developing
-1. action
-2. cert auth
+1. cert auth
 
 #Usage
 ```
