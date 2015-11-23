@@ -427,6 +427,10 @@ class Actions(Base):
         """Restarts Icinga2. May or may not return.
 
         This action does not support a target type or filter.
+
+
+        example 1:
+        restart_process()
         """
         url = '%s/%s' % (self.root,"restart-process")
         return self.request("post",url)
