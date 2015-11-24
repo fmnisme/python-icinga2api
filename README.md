@@ -2,6 +2,7 @@
 1. basic auth
 2. objects (list,create,update,delete) 
 3. actions
+4. events
 
 #Developing
 1. cert auth

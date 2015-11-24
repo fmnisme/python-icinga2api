@@ -27,6 +27,7 @@ class Client(object):
         self.username = username
         self.objects = Objects(self)
         self.actions = Actions(self)
+        self.events = Events(self)
 
 
 class Base(object):
@@ -34,8 +35,9 @@ class Base(object):
 
     def __init__(self,manager):
         self.manager = manager
+        self.stream_cache = ""
 
-    def request(self,method,url,payload=None):
+    def request(self,method,url,payload=None,stream=False):
         headers = {
             "Accept": "application/json",
         }
@@ -45,6 +47,7 @@ class Base(object):
             "headers" : headers,
             "auth" : HTTPBasicAuth(self.manager.username, self.manager.password),
             "verify" : False,
+            "stream" : stream,
         }
         if method in ["get",]:
             kwargs["params"] = payload
@@ -55,10 +58,27 @@ class Base(object):
         print kwargs
         request_method = getattr(requests,method)
         response = request_method(self.manager.api_endpoint+url, **kwargs)
-
         if not (200 <= response.status_code <=299):
             raise Icinga2ApiException(response.text)
-        return response.json()
+
+        if stream:
+            return lambda chunk_size : response.iter_content(chunk_size=chunk_size)
+        else:
+            return response.json()
+
+    #TODO 使用stringIO
+    def fetech_from_stream(self,stream,split_str='\n',chunk_size=1024):
+        """将stream中的多个chunk合并,并返回其中完整的数据
+        :param split: 每条数据之间的分隔符
+        :param chunk_size: byte
+        :return:
+        """
+        for chunk in stream(chunk_size):
+            self.stream_cache += chunk
+            lines = self.stream_cache.split(split_str)
+            if len(lines) >= 2:
+                self.stream_cache = lines[-1]#保留最后一行,他可能是不完整的.
+                yield lines[:-1]
 
 
 class Objects(Base):
@@ -434,3 +454,56 @@ class Actions(Base):
         """
         url = '%s/%s' % (self.root,"restart-process")
         return self.request("post",url)
+
+
+class Events(Base):
+    root = "/v1/events"
+
+    def subscribe(self,types,queue,filters=None):
+        """You can subscribe to event streams by sending a POST request to the URL endpoint /v1/events.
+
+        The following parameters need to be specified (either as URL parameters or in a JSON-encoded message body):
+        Parameter 	Type 	Description
+        types 	string array 	Required. Event type(s). Multiple types as URL parameters are supported.
+        queue 	string 	Required. Unique queue name. Multiple HTTP clients can use the same queue as long as they use the same event types and filter.
+        filter 	string 	Optional. Filter for specific event attributes using filter expressions.
+
+        Event Stream Types
+
+        The following event stream types are available:
+        Type 	Description
+        CheckResult 	Check results for hosts and services.
+        StateChange 	Host/service state changes.
+        Notification 	Notification events including notified users for hosts and services.
+        AcknowledgementSet 	Acknowledgement set on hosts and services.
+        AcknowledgementCleared 	Acknowledgement cleared on hosts and services.
+        CommentAdded 	Comment added for hosts and services.
+        CommentRemoved 	Comment removed for hosts and services.
+        DowntimeAdded 	Downtime added for hosts and services.
+        DowntimeRemoved 	Downtime removed for hosts and services.
+        DowntimeTriggered 	Downtime triggered for hosts and services.
+
+        Note: Each type requires API permissions being set.
+
+
+        example 1:
+        types = ["CheckResult"]
+        queue = "michi"
+        filters = "event.check_result.exit_status==2"
+        for event in subscribe(types,queue,filters):
+            print event
+        :param types:
+        :param queue:
+        :param filters:
+        :return:
+        """
+        payload = {
+            "types" : types,
+            "queue" : queue,
+        }
+        if filters:
+            payload["filters"] = filters
+        stream = self.request('post',self.root,payload,stream=True)
+        for events in self.fetech_from_stream(stream):   #return list
+            for event in events:
+                yield event
