@@ -20,4 +20,4 @@ client.objects.list('hosts',filter=filter)
 
 ```
 
-More Info: ![Icinga 2 API](http://docs.icinga.org/icinga2/latest/doc/module/icinga2/toc#!/icinga2/latest/doc/module/icinga2/chapter/icinga2-api)
+**read source commentary for more examples.**
