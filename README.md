@@ -10,13 +10,13 @@
 #Usage
 ```
 from icinga2api.client import Client
-client = Client('https://localhost:5665/v1','username','passowrd')
+client = Client('https://localhost:5665','username','passowrd')
 
 #list
-filter = {
+filters = {
     "attrs" : ["name", "address"],
 }
-client.objects.list('hosts',filter=filter)
+client.objects.list('hosts',filters=filters)
 
 ```
 
