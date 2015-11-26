@@ -7,6 +7,8 @@
 
 #Developing
 1. cert auth
+2. zone
+3. Configuration Management
 
 #Usage
 ```
