@@ -28,6 +28,7 @@ class Client(object):
         self.objects = Objects(self)
         self.actions = Actions(self)
         self.events = Events(self)
+        self.status = Status(self)
 
 
 class Base(object):
@@ -507,3 +508,22 @@ class Events(Base):
         for events in self.fetech_from_stream(stream):   #return list
             for event in events:
                 yield event
+
+
+class Status(Base):
+    root = "/v1/status"
+
+    def list(self,status_type=None):
+        """Send a GET request to the URL endpoint /v1/status to retrieve status information and statistics for Icinga 2.
+
+        You can limit the output by specifying a status type in the URL, e.g. IcingaApplication.
+
+
+        example 1:
+        print list()
+        """
+        url = self.root
+        if status_type:
+            url += "/%s" % (status_type)
+
+        return self.request('get',url)

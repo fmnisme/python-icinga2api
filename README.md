@@ -3,6 +3,7 @@
 2. objects (list,create,update,delete) 
 3. actions
 4. events
+5. status
 
 #Developing
 1. cert auth
