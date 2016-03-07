@@ -19,7 +19,7 @@ class Icinga2ApiException(Exception):
     Icinga 2 API exception class
     """
 
-    def __init__(self,error):
+    def __init__(self, error):
         self.error = error
 
     def __str__(self):
@@ -31,7 +31,7 @@ class Client(object):
     Icinga 2 Client class
     """
 
-    def __init__(self,api_endpoint,username,password):
+    def __init__(self, api_endpoint, username, password):
         self.api_endpoint = api_endpoint
         self.password = password
         self.username = username
@@ -46,43 +46,43 @@ class Base(object):
     Icinga 2 API Base class
     """
 
-    root = None #继承
+    root = None  # 继承
 
-    def __init__(self,manager):
+    def __init__(self, manager):
         self.manager = manager
         self.stream_cache = ""
 
-    def request(self,method,url,payload=None,stream=False):
+    def request(self, method, url, payload=None, stream=False):
         headers = {
             "Accept": "application/json",
         }
 
-        #request参数
+        # request参数
         kwargs = {
-            "headers" : headers,
-            "auth" : HTTPBasicAuth(self.manager.username, self.manager.password),
-            "verify" : False,
-            "stream" : stream,
+            "headers": headers,
+            "auth": HTTPBasicAuth(self.manager.username, self.manager.password),
+            "verify": False,
+            "stream": stream,
         }
-        if method in ["get",]:
+        if method in ["get", ]:
             kwargs["params"] = payload
         else:
             kwargs["json"] = payload
 
         print(url)
         print(kwargs)
-        request_method = getattr(requests,method)
-        response = request_method(self.manager.api_endpoint+url, **kwargs)
-        if not (200 <= response.status_code <=299):
+        request_method = getattr(requests, method)
+        response = request_method(self.manager.api_endpoint + url, **kwargs)
+        if not (200 <= response.status_code <= 299):
             raise Icinga2ApiException(response.text)
 
         if stream:
-            return lambda chunk_size : response.iter_content(chunk_size=chunk_size)
+            return lambda chunk_size: response.iter_content(chunk_size=chunk_size)
         else:
             return response.json()
 
-    #TODO 使用stringIO
-    def fetech_from_stream(self,stream,split_str='\n',chunk_size=1024):
+    # TODO 使用stringIO
+    def fetech_from_stream(self, stream, split_str='\n', chunk_size=1024):
         """将stream中的多个chunk合并,并返回其中完整的数据
         :param split: 每条数据之间的分隔符
         :param chunk_size: byte
@@ -92,7 +92,7 @@ class Base(object):
             self.stream_cache += chunk
             lines = self.stream_cache.split(split_str)
             if len(lines) >= 2:
-                self.stream_cache = lines[-1]#保留最后一行,他可能是不完整的.
+                self.stream_cache = lines[-1]  # 保留最后一行,他可能是不完整的.
                 yield lines[:-1]
 
 
@@ -103,21 +103,21 @@ class Objects(Base):
 
     root = '/v1/objects'
 
-    def list(self,object_type,name=None,filters=None):
+    def list(self, object_type, name=None, filters=None):
         url = '{}/{}'.format(self.root, object_type)
         if name:
             url += '/{}'.format(name)
-        return self.request('get',url,payload=filters)
+        return self.request('get', url, payload=filters)
 
-    def create(self,object_type,name,config):
+    def create(self, object_type, name, config):
         url = '{}/{}/{}'.format(self.root, object_type, name)
-        return self.request('put',url,payload=config)
+        return self.request('put', url, payload=config)
 
-    def update(self,object_type,name,config):
+    def update(self, object_type, name, config):
         url = '{}/{}/{}'.format(self.root, object_type, name)
-        return self.request('post',url,payload=config)
+        return self.request('post', url, payload=config)
 
-    def delete(self,object_type,name=None,filters=None,cascade=True):
+    def delete(self, object_type, name=None, filters=None, cascade=True):
         if not filters:
             filters = {}
         if cascade:
@@ -126,7 +126,7 @@ class Objects(Base):
         url = '{}/{}'.format(self.root, object_type)
         if name:
             url += '/{}'.format(name)
-        return self.request('delete',url,payload=filters)
+        return self.request('delete', url, payload=filters)
 
 
 class Actions(Base):
@@ -136,7 +136,13 @@ class Actions(Base):
 
     root = '/v1/actions'
 
-    def process_check_result(self,filters,exit_status,plugin_output,performance_data=None,check_command=None,check_source=None):
+    def process_check_result(self,
+                             filters,
+                             exit_status,
+                             plugin_output,
+                             performance_data=None,
+                             check_command=None,
+                             check_source=None):
         """Process a check result for a host or a service.
 
         Parameter 	Type 	Description
@@ -176,10 +182,10 @@ class Actions(Base):
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.root, "process-check-result")
 
-        #payload
+        # payload
         payload = {
-            "exit_status" : exit_status,
-            "plugin_output" : plugin_output,
+            "exit_status": exit_status,
+            "plugin_output": plugin_output,
         }
         if performance_data:
             payload["performance_data"] = performance_data
@@ -188,9 +194,9 @@ class Actions(Base):
         if check_source:
             payload["check_source"] = check_source
         payload.update(filters)
-        return self.request('post',url,payload=payload)
+        return self.request('post', url, payload=payload)
 
-    def reschedule_check(self,filters,next_check=None,force_check=True):
+    def reschedule_check(self, filters, next_check=None, force_check=True):
         """Reschedule a check for hosts and services. The check can be forced if required.
 
         Parameter 	Type 	Description
@@ -219,14 +225,14 @@ class Actions(Base):
         url = '{}/{}'.format(self.root, "reschedule-check")
 
         payload = {
-            "force_check" : force_check
+            "force_check": force_check
         }
         if next_check:
             payload["next_check"] = next_check
         payload.update(filters)
-        return self.request('post',url,payload=payload)
+        return self.request('post', url, payload=payload)
 
-    def send_custom_notification(self,filters,author,comment,force=False):
+    def send_custom_notification(self, filters, author, comment, force=False):
         """Send a custom notification for hosts and services. This notification type can be forced being sent to all users.
 
         Parameter 	Type 	Description
@@ -248,14 +254,14 @@ class Actions(Base):
         url = '{}/{}'.format(self.root, "send-custom-notification")
 
         payload = {
-            "author" : author,
-            "comment" : comment,
-            "force" : force
+            "author": author,
+            "comment": comment,
+            "force": force
         }
         payload.update(filters)
-        return self.request('post',url,payload)
+        return self.request('post', url, payload)
 
-    def delay_notification(self,filters,timestamp):
+    def delay_notification(self, filters, timestamp):
         """Delay notifications for a host or a service.
         Note that this will only have an effect if the service stays in the same problem state that it is currently in.
         If the service changes to another state, a new notification may go out before the time you specify in the timestamp argument.
@@ -285,12 +291,12 @@ class Actions(Base):
         url = '{}/{}'.format(self.root, "delay-notification")
 
         payload = {
-            "timestamp" : timestamp
+            "timestamp": timestamp
         }
         payload.update(filters)
-        return self.request('post',url,payload)
+        return self.request('post', url, payload)
 
-    def acknowledge_problem(self,filters,author,comment,expiry=None,sticky=None,notify=None):
+    def acknowledge_problem(self, filters, author, comment, expiry=None, sticky=None, notify=None):
         """Allows you to acknowledge the current problem for hosts or services.
         By acknowledging the current problem, future notifications (for the same state if sticky is set to false) are disabled.
 
@@ -308,8 +314,8 @@ class Actions(Base):
         url = '{}/{}'.format(self.root, "acknowledge-problem")
 
         payload = {
-            "author" : author,
-            "comment" : comment,
+            "author": author,
+            "comment": comment,
         }
         if expiry:
             payload["expiry"] = expiry
@@ -318,9 +324,9 @@ class Actions(Base):
         if notify:
             payload["notify"] = notify
         payload.update(filters)
-        return self.request("post",url,payload)
+        return self.request("post", url, payload)
 
-    def remove_acknowledgement(self,filters):
+    def remove_acknowledgement(self, filters):
         """Removes the acknowledgements for services or hosts. Once the acknowledgement has been removed notifications will be sent out again.
 
         A filter must be provided. The valid types for this action are Host and Service.
@@ -340,9 +346,9 @@ class Actions(Base):
 
         payload = {}
         payload.update(filters)
-        return self.request("post",url,payload)
+        return self.request("post", url, payload)
 
-    def add_comment(self,filters,author,comment):
+    def add_comment(self, filters, author, comment):
         """Adds a comment from an author to services or hosts.
 
         Parameter 	Type 	Description
@@ -365,13 +371,13 @@ class Actions(Base):
         url = '{}/{}'.format(self.root, "add-comment")
 
         payload = {
-            "author" : author,
-            "comment" : comment
+            "author": author,
+            "comment": comment
         }
         payload.update(filters)
-        return self.request("post",url,payload)
+        return self.request("post", url, payload)
 
-    def remove_comment(self,filters):
+    def remove_comment(self, filters):
         """Remove the comment using its name attribute , returns OK if the comment did not exist. Note: This is not the legacy ID but the comment name returned by Icinga 2 when adding a comment.
 
         A filter must be provided. The valid types for this action are Host, Service and Comment.
@@ -390,9 +396,17 @@ class Actions(Base):
 
         payload = {}
         payload.update(filters)
-        return self.request("post",url,payload)
+        return self.request("post", url, payload)
 
-    def schedule_downtime(self,filters,start_time,end_time,duration,fixed=None,trigger_name=None,comment=None,author=None):
+    def schedule_downtime(self,
+                          filters,
+                          start_time,
+                          end_time,
+                          duration,
+                          fixed=None,
+                          trigger_name=None,
+                          comment=None,
+                          author=None):
         """Schedule a downtime for hosts and services.
 
         Parameter 	Type 	Description
@@ -418,9 +432,9 @@ class Actions(Base):
         url = '{}/{}'.format(self.root, "schedule-downtime")
 
         payload = {
-            "start_time" : start_time,
-            "end_time" : end_time,
-            "duration" : duration
+            "start_time": start_time,
+            "end_time": end_time,
+            "duration": duration
         }
         if fixed:
             payload["fixed"] = fixed
@@ -431,9 +445,9 @@ class Actions(Base):
         if author:
             payload["author"] = author
         payload.update(filters)
-        return self.request("post",url,payload)
+        return self.request("post", url, payload)
 
-    def remove_downtime(self,filters):
+    def remove_downtime(self, filters):
         """Remove the downtime using its name attribute , returns OK if the downtime did not exist. Note: This is not the legacy ID but the downtime name returned by Icinga 2 when scheduling a downtime.
 
         A filter must be provided. The valid types for this action are Host, Service and Downtime.
@@ -452,7 +466,7 @@ class Actions(Base):
 
         payload = {}
         payload.update(filters)
-        return self.request("post",url,payload)
+        return self.request("post", url, payload)
 
     def shutdown_process(self):
         """Shuts down Icinga2. May or may not return.
@@ -464,7 +478,7 @@ class Actions(Base):
         shutdown_process()
         """
         url = '{}/{}'.format(self.root, "shutdown-process")
-        return self.request("post",url)
+        return self.request("post", url)
 
     def restart_process(self):
         """Restarts Icinga2. May or may not return.
@@ -476,7 +490,7 @@ class Actions(Base):
         restart_process()
         """
         url = '{}/{}'.format(self.root, "restart-process")
-        return self.request("post",url)
+        return self.request("post", url)
 
 
 class Events(Base):
@@ -486,7 +500,7 @@ class Events(Base):
 
     root = "/v1/events"
 
-    def subscribe(self,types,queue,filters=None):
+    def subscribe(self, types, queue, filters=None):
         """You can subscribe to event streams by sending a POST request to the URL endpoint /v1/events.
 
         The following parameters need to be specified (either as URL parameters or in a JSON-encoded message body):
@@ -525,13 +539,13 @@ class Events(Base):
         :return:
         """
         payload = {
-            "types" : types,
-            "queue" : queue,
+            "types": types,
+            "queue": queue,
         }
         if filters:
             payload["filters"] = filters
-        stream = self.request('post',self.root,payload,stream=True)
-        for events in self.fetech_from_stream(stream):   #return list
+        stream = self.request('post', self.root, payload, stream=True)
+        for events in self.fetech_from_stream(stream):   # return list
             for event in events:
                 yield event
 
@@ -543,7 +557,7 @@ class Status(Base):
 
     root = "/v1/status"
 
-    def list(self,status_type=None):
+    def list(self, status_type=None):
         """Send a GET request to the URL endpoint /v1/status to retrieve status information and statistics for Icinga 2.
 
         You can limit the output by specifying a status type in the URL, e.g. IcingaApplication.
@@ -556,4 +570,4 @@ class Status(Base):
         if status_type:
             url += "/{}".format(status_type)
 
-        return self.request('get',url)
+        return self.request('get', url)
