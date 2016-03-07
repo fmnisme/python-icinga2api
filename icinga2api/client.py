@@ -4,6 +4,8 @@ icinga2 api client
 
 write for icinga2 2.4
 """
+
+from __future__ import print_function
 import logging
 import requests
 from requests.auth import HTTPBasicAuth
@@ -55,8 +57,8 @@ class Base(object):
         else:
             kwargs["json"] = payload
 
-        print url
-        print kwargs
+        print(url)
+        print(kwargs)
         request_method = getattr(requests,method)
         response = request_method(self.manager.api_endpoint+url, **kwargs)
         if not (200 <= response.status_code <=299):
