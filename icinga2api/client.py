@@ -31,8 +31,19 @@ class Client(object):
     Icinga 2 Client class
     """
 
-    def __init__(self, api_endpoint, username, password):
+    def __init__(self,
+                 api_endpoint,
+                 username,
+                 password,
+                 certificate=None,
+                 ca_certificate='/etc/icinga2/pki/ca.crt'):
+        """
+        initialize object
+        """
+
         self.api_endpoint = api_endpoint
+        self.certificate = certificate
+        self.ca_certificate = ca_certificate
         self.password = password
         self.username = username
         self.objects = Objects(self)
@@ -49,37 +60,62 @@ class Base(object):
     root = None  # 继承
 
     def __init__(self, manager):
+        """
+        initialize object
+        """
+
         self.manager = manager
         self.stream_cache = ""
 
-    def request(self, method, url, payload=None, stream=False):
-        headers = {
-            "Accept": "application/json",
+    def _create_session(self, method='POST'):
+        '''
+        create a session object
+        '''
+
+        session = requests.Session()
+        # prefer certificate authentification
+        # TODO: make it configurable
+        if self.manager.certificate and self.manager.key:
+            # certificate and key are in different files
+            session.cert = (self.manager.certificate, self.manager.key)
+        elif self.manager.certificate:
+            # certificate and key are in the same file
+            session.cert = self.manager.certificate
+        elif self.manager.username and self.manager.password:
+            # use username and password
+            session.auth = (self.manager.username, self.manager.password)
+        session.headers = {
+            #'User-Agent': 'Python-icinga2-client/{0}'.format(self.manager.version),
+            'X-HTTP-Method-Override': method.upper(),
+            'Accept': 'application/json'
         }
 
-        # request参数
-        kwargs = {
-            "headers": headers,
-            "auth": HTTPBasicAuth(self.manager.username, self.manager.password),
-            "verify": False,
-            "stream": stream,
-        }
-        if method in ["get", ]:
-            kwargs["params"] = payload
-        else:
-            kwargs["json"] = payload
+        return session
 
-        print(url)
-        print(kwargs)
-        request_method = getattr(requests, method)
-        response = request_method(self.manager.api_endpoint + url, **kwargs)
-        if not (200 <= response.status_code <= 299):
-            raise Icinga2ApiException(response.text)
+    def _request(self, method='POST', url=None, payload=None):
+        '''
+        make the request and return the body
+        '''
 
-        if stream:
-            return lambda chunk_size: response.iter_content(chunk_size=chunk_size)
-        else:
-            return response.json()
+        LOG.debug("Request URL: {0}".format(url))
+
+        session = self._create_session(method)
+        request_url = '{}/{}'.format(
+            self.manager.api_endpoint,
+            url)
+
+        request = session.post(
+            url=request_url,
+            json=payload,
+            verify=self.manager.ca_certificate)
+
+        session.close()
+        from pprint import pprint
+        pprint(url)
+        pprint(payload)
+        pprint(request)
+
+        return request.json()
 
     # TODO 使用stringIO
     def fetech_from_stream(self, stream, split_str='\n', chunk_size=1024):
@@ -107,15 +143,15 @@ class Objects(Base):
         url = '{}/{}'.format(self.root, object_type)
         if name:
             url += '/{}'.format(name)
-        return self.request('get', url, payload=filters)
+        return self._request('GET', url, payload=filters)
 
     def create(self, object_type, name, config):
         url = '{}/{}/{}'.format(self.root, object_type, name)
-        return self.request('put', url, payload=config)
+        return self._request('PUT', url, payload=config)
 
     def update(self, object_type, name, config):
         url = '{}/{}/{}'.format(self.root, object_type, name)
-        return self.request('post', url, payload=config)
+        return self._request('POST', url, payload=config)
 
     def delete(self, object_type, name=None, filters=None, cascade=True):
         if not filters:
@@ -126,7 +162,7 @@ class Objects(Base):
         url = '{}/{}'.format(self.root, object_type)
         if name:
             url += '/{}'.format(name)
-        return self.request('delete', url, payload=filters)
+        return self._request('DELETE', url, payload=filters)
 
 
 class Actions(Base):
@@ -194,7 +230,7 @@ class Actions(Base):
         if check_source:
             payload["check_source"] = check_source
         payload.update(filters)
-        return self.request('post', url, payload=payload)
+        return self._request('POST', url, payload=payload)
 
     def reschedule_check(self, filters, next_check=None, force_check=True):
         """Reschedule a check for hosts and services. The check can be forced if required.
@@ -230,7 +266,7 @@ class Actions(Base):
         if next_check:
             payload["next_check"] = next_check
         payload.update(filters)
-        return self.request('post', url, payload=payload)
+        return self._request('POST', url, payload=payload)
 
     def send_custom_notification(self, filters, author, comment, force=False):
         """Send a custom notification for hosts and services. This notification type can be forced being sent to all users.
@@ -259,7 +295,7 @@ class Actions(Base):
             "force": force
         }
         payload.update(filters)
-        return self.request('post', url, payload)
+        return self._request('POST', url, payload)
 
     def delay_notification(self, filters, timestamp):
         """Delay notifications for a host or a service.
@@ -294,7 +330,7 @@ class Actions(Base):
             "timestamp": timestamp
         }
         payload.update(filters)
-        return self.request('post', url, payload)
+        return self._request('POST', url, payload)
 
     def acknowledge_problem(self, filters, author, comment, expiry=None, sticky=None, notify=None):
         """Allows you to acknowledge the current problem for hosts or services.
@@ -324,7 +360,7 @@ class Actions(Base):
         if notify:
             payload["notify"] = notify
         payload.update(filters)
-        return self.request("post", url, payload)
+        return self._request('POST', url, payload)
 
     def remove_acknowledgement(self, filters):
         """Removes the acknowledgements for services or hosts. Once the acknowledgement has been removed notifications will be sent out again.
@@ -346,7 +382,7 @@ class Actions(Base):
 
         payload = {}
         payload.update(filters)
-        return self.request("post", url, payload)
+        return self._request('POST', url, payload)
 
     def add_comment(self, filters, author, comment):
         """Adds a comment from an author to services or hosts.
@@ -375,7 +411,7 @@ class Actions(Base):
             "comment": comment
         }
         payload.update(filters)
-        return self.request("post", url, payload)
+        return self._request('POST', url, payload)
 
     def remove_comment(self, filters):
         """Remove the comment using its name attribute , returns OK if the comment did not exist. Note: This is not the legacy ID but the comment name returned by Icinga 2 when adding a comment.
@@ -396,7 +432,7 @@ class Actions(Base):
 
         payload = {}
         payload.update(filters)
-        return self.request("post", url, payload)
+        return self._request('POST', url, payload)
 
     def schedule_downtime(self,
                           filters,
@@ -445,7 +481,7 @@ class Actions(Base):
         if author:
             payload["author"] = author
         payload.update(filters)
-        return self.request("post", url, payload)
+        return self._request('POST', url, payload)
 
     def remove_downtime(self, filters):
         """Remove the downtime using its name attribute , returns OK if the downtime did not exist. Note: This is not the legacy ID but the downtime name returned by Icinga 2 when scheduling a downtime.
@@ -466,7 +502,7 @@ class Actions(Base):
 
         payload = {}
         payload.update(filters)
-        return self.request("post", url, payload)
+        return self._request('POST', url, payload)
 
     def shutdown_process(self):
         """Shuts down Icinga2. May or may not return.
@@ -478,7 +514,7 @@ class Actions(Base):
         shutdown_process()
         """
         url = '{}/{}'.format(self.root, "shutdown-process")
-        return self.request("post", url)
+        return self._request('POST', url)
 
     def restart_process(self):
         """Restarts Icinga2. May or may not return.
@@ -490,7 +526,7 @@ class Actions(Base):
         restart_process()
         """
         url = '{}/{}'.format(self.root, "restart-process")
-        return self.request("post", url)
+        return self._request('POST', url)
 
 
 class Events(Base):
@@ -544,7 +580,7 @@ class Events(Base):
         }
         if filters:
             payload["filters"] = filters
-        stream = self.request('post', self.root, payload, stream=True)
+        stream = self._request('POST', self.root, payload, stream=True)
         for events in self.fetech_from_stream(stream):   # return list
             for event in events:
                 yield event
@@ -570,4 +606,4 @@ class Status(Base):
         if status_type:
             url += "/{}".format(status_type)
 
-        return self.request('get', url)
+        return self._request('GET', url)
