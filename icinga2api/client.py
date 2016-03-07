@@ -392,7 +392,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'format(self.root, "remove-comment")
+        url = '{}/{}'.format(self.root, "remove-comment")
 
         payload = {}
         payload.update(filters)
