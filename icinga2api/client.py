@@ -139,11 +139,17 @@ class Objects(Base):
 
     root = '/v1/objects'
 
-    def list(self, object_type, name=None, filters=None):
+    def list(self, object_type, name=None, attrs=None, filters=None):
         url = '{}/{}'.format(self.root, object_type)
+
+        payload = {}
+        if attrs:
+            payload['attrs'] = attrs
+        if filters:
+            payload['filter'] = filters
         if name:
             url += '/{}'.format(name)
-        return self._request('GET', url, payload=filters)
+        return self._request('GET', url, payload)
 
     def create(self, object_type, name, config):
         url = '{}/{}/{}'.format(self.root, object_type, name)
