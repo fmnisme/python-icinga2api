@@ -88,17 +88,17 @@ class Objects(Base):
     root = '/v1/objects'
 
     def list(self,object_type,name=None,filters=None):
-        url = '%s/%s' % (self.root,object_type)
+        url = '{}/{}'.format(self.root, object_type)
         if name:
-            url += '/%s' % name
+            url += '/{}'.format(name)
         return self.request('get',url,payload=filters)
 
     def create(self,object_type,name,config):
-        url = '%s/%s/%s' % (self.root,object_type,name)
+        url = '{}/{}/{}'.format(self.root, object_type, name)
         return self.request('put',url,payload=config)
 
     def update(self,object_type,name,config):
-        url = '%s/%s/%s' % (self.root,object_type,name)
+        url = '{}/{}/{}'.format(self.root, object_type, name)
         return self.request('post',url,payload=config)
 
     def delete(self,object_type,name=None,filters=None,cascade=True):
@@ -107,9 +107,9 @@ class Objects(Base):
         if cascade:
             filters["cascade"] = 1
 
-        url = '%s/%s' % (self.root,object_type)
+        url = '{}/{}'.format(self.root, object_type)
         if name:
-            url += '/%s' % name
+            url += '/{}'.format(name)
         return self.request('delete',url,payload=filters)
 
 
@@ -154,7 +154,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"process-check-result")
+        url = '{}/{}'.format(self.root, "process-check-result")
 
         #payload
         payload = {
@@ -196,7 +196,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"reschedule-check")
+        url = '{}/{}'.format(self.root, "reschedule-check")
 
         payload = {
             "force_check" : force_check
@@ -225,7 +225,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"send-custom-notification")
+        url = '{}/{}'.format(self.root, "send-custom-notification")
 
         payload = {
             "author" : author,
@@ -262,7 +262,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"delay-notification")
+        url = '{}/{}'.format(self.root, "delay-notification")
 
         payload = {
             "timestamp" : timestamp
@@ -285,7 +285,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"acknowledge-problem")
+        url = '{}/{}'.format(self.root, "acknowledge-problem")
 
         payload = {
             "author" : author,
@@ -316,7 +316,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"remove-acknowledgement")
+        url = '{}/{}'.format(self.root, "remove-acknowledgement")
 
         payload = {}
         payload.update(filters)
@@ -342,7 +342,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"add-comment")
+        url = '{}/{}'.format(self.root, "add-comment")
 
         payload = {
             "author" : author,
@@ -366,7 +366,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"remove-comment")
+        url = '{}/{}'format(self.root, "remove-comment")
 
         payload = {}
         payload.update(filters)
@@ -395,7 +395,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"schedule-downtime")
+        url = '{}/{}'.format(self.root, "schedule-downtime")
 
         payload = {
             "start_time" : start_time,
@@ -428,7 +428,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '%s/%s' % (self.root,"remove-downtime")
+        url = '{}/{}'.format(self.root, "remove-downtime")
 
         payload = {}
         payload.update(filters)
@@ -443,7 +443,7 @@ class Actions(Base):
         example 1:
         shutdown_process()
         """
-        url = '%s/%s' % (self.root,"shutdown-process")
+        url = '{}/{}'.format(self.root, "shutdown-process")
         return self.request("post",url)
 
     def restart_process(self):
@@ -455,7 +455,7 @@ class Actions(Base):
         example 1:
         restart_process()
         """
-        url = '%s/%s' % (self.root,"restart-process")
+        url = '{}/{}'.format(self.root, "restart-process")
         return self.request("post",url)
 
 
@@ -526,6 +526,6 @@ class Status(Base):
         """
         url = self.root
         if status_type:
-            url += "/%s" % (status_type)
+            url += "/{}".format(status_type)
 
         return self.request('get',url)
