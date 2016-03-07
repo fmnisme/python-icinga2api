@@ -15,6 +15,10 @@ LOG = logging.getLogger(__name__)
 
 
 class Icinga2ApiException(Exception):
+    """
+    Icinga 2 API exception class
+    """
+
     def __init__(self,error):
         self.error = error
 
@@ -23,6 +27,10 @@ class Icinga2ApiException(Exception):
 
 
 class Client(object):
+    """
+    Icinga 2 Client class
+    """
+
     def __init__(self,api_endpoint,username,password):
         self.api_endpoint = api_endpoint
         self.password = password
@@ -34,6 +42,10 @@ class Client(object):
 
 
 class Base(object):
+    """
+    Icinga 2 API Base class
+    """
+
     root = None #继承
 
     def __init__(self,manager):
@@ -85,6 +97,10 @@ class Base(object):
 
 
 class Objects(Base):
+    """
+    Icinga 2 API objects class
+    """
+
     root = '/v1/objects'
 
     def list(self,object_type,name=None,filters=None):
@@ -114,6 +130,10 @@ class Objects(Base):
 
 
 class Actions(Base):
+    """
+    Icinga 2 API actions class
+    """
+
     root = '/v1/actions'
 
     def process_check_result(self,filters,exit_status,plugin_output,performance_data=None,check_command=None,check_source=None):
@@ -460,6 +480,10 @@ class Actions(Base):
 
 
 class Events(Base):
+    """
+    Icinga 2 API events class
+    """
+
     root = "/v1/events"
 
     def subscribe(self,types,queue,filters=None):
@@ -513,6 +537,10 @@ class Events(Base):
 
 
 class Status(Base):
+    """
+    Icinga 2 API status class
+    """
+
     root = "/v1/status"
 
     def list(self,status_type=None):
