@@ -224,6 +224,9 @@ class Objects(Base):
 
         example 5:
         list('Service', joins=['host.name'])
+
+        example 6:
+        list('Service', joins=True)
         """
 
         url_object_type = self._convert_object_type(object_type)
