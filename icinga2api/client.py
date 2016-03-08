@@ -179,12 +179,46 @@ class Objects(Base):
         """
 
         type_conv = {
+            'ApiListener': 'apilisteners',
+            'ApiUser': 'apiusers',
+            'CheckCommand': 'checkcommands',
+            'Arguments': 'argumentss',
+            'CheckerComponent': 'checkercomponents',
+            'CheckResultReader': 'checkresultreaders',
+            'Comment': 'comments',
+            'CompatLogger': 'compatloggers',
+            'Dependency': 'dependencys',
+            'Downtime': 'downtimes',
+            'Endpoint': 'endpoints',
+            'EventCommand': 'eventcommands',
+            'ExternalCommandListener': 'externalcommandlisteners',
+            'FileLogger': 'fileloggers',
+            'GelfWriter': 'gelfwriters',
+            'GraphiteWriter': 'graphitewriters',
             'Host': 'hosts',
-            'Service': 'services',
+            'HostGroup': 'hostgroups',
+            'IcingaApplication': 'icingaapplications',
+            'IdoMySqlConnection': 'idomysqlconnections',
+            'IdoPgSqlConnection': 'idopgsqlconnections',
+            'LiveStatusListener': 'livestatuslisteners',
             'Notification': 'notifications',
-            'Dependency': 'dependencies',
+            'NotificationCommand': 'notificationcommands',
+            'NotificationComponent': 'notificationcomponents',
+            'OpenTsdbWriter': 'opentsdbwriters',
+            'PerfdataWriter': 'perfdatawriters',
+            'ScheduledDowntime': 'scheduleddowntimes',
+            'Service': 'services',
+            'ServiceGroup': 'servicegroups',
+            'StatusDataWriter': 'statusdatawriters',
+            'SyslogLogger': 'syslogloggers',
+            'TimePeriod': 'timeperiods',
             'User': 'users',
-            'Zone': 'zones'}
+            'UserGroup': 'usergroups',
+            'Zone': 'zones',
+        }
+        if not object_type in type_conv:
+            raise Icinga2ApiException('Object type "{}" does not exist.'.format(object_type))
+
         url = '{}/{}'.format(self.root, type_conv[object_type])
         if name:
             url += '/{}'.format(name)
