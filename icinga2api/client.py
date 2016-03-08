@@ -10,6 +10,7 @@ import logging
 import requests
 from requests.auth import HTTPBasicAuth
 
+import icinga2api
 
 LOG = logging.getLogger(__name__)
 
@@ -50,6 +51,7 @@ class Client(object):
         self.actions = Actions(self)
         self.events = Events(self)
         self.status = Status(self)
+        self.version = icinga2api.__version__
 
 
 class Base(object):
@@ -85,7 +87,7 @@ class Base(object):
             # use username and password
             session.auth = (self.manager.username, self.manager.password)
         session.headers = {
-            #'User-Agent': 'Python-icinga2-client/{0}'.format(self.manager.version),
+            'User-Agent': 'Python-icinga2api/{0}'.format(self.manager.version),
             'X-HTTP-Method-Override': method.upper(),
             'Accept': 'application/json'
         }
