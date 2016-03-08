@@ -37,7 +37,7 @@ class Client(object):
                  username,
                  password,
                  certificate=None,
-                 ca_certificate='/etc/icinga2/pki/ca.crt'):
+                 ca_certificate=None):
         """
         initialize object
         """
@@ -101,15 +101,21 @@ class Base(object):
 
         LOG.debug("Request URL: {0}".format(url))
 
+        # create session
         session = self._create_session(method)
-        request_url = '{}/{}'.format(
-            self.manager.api_endpoint,
-            url)
 
-        request = session.post(
-            url=request_url,
-            json=payload,
-            verify=self.manager.ca_certificate)
+        # create arguments for the request
+        request_args = {
+            'url': '{}/{}'.format(self.manager.api_endpoint, url)}
+        if payload:
+            request_args['json'] = payload
+        if self.manager.ca_certificate:
+            request_args['verify'] = self.manager.ca_certificate
+        else:
+            request_args['verify'] = False
+
+        # do the request
+        request = session.post(**request_args)
 
         session.close()
         from pprint import pprint
