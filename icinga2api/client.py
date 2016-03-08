@@ -155,12 +155,12 @@ class Objects(Base):
         :type object_type: string
         :param name: list object with this name
         :type name: string
-        :param object_attrs: only return these attributes
-        :type object_attrs: list
-        :param object_filter: filter the object list
-        :type object_filter: string
-        :param object_joins: show joined object
-        :type object_filter: list
+        :param attrs: only return these attributes
+        :type attrs: list
+        :param filters: filter the object list
+        :type filters: string
+        :param joins: show joined object
+        :type joins: list
 
         example 1:
         list('Host')
@@ -174,8 +174,8 @@ class Objects(Base):
         example 4:
         list('Host', filters='match("webserver*", host.name)')
 
-        example 4:
-        list('Service', joins='["host.name"]')
+        example 5:
+        list('Service', joins=['host.name'])
         """
 
         type_conv = {
