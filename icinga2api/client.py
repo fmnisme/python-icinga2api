@@ -148,7 +148,39 @@ class Objects(Base):
     root = '/v1/objects'
 
     def list(self, object_type, name=None, attrs=None, filters=None):
-        url = '{}/{}'.format(self.root, object_type)
+        """
+        get object by type or name
+
+        :param object_type: type of the object
+        :type object_type: string
+        :param name: list object with this name
+        :type name: string
+        :param object_attrs: only return these attributes
+        :type object_attrs: list
+        :param object_filter: filter the object list
+        :type object_filter: string
+
+        example 1:
+        list('Host')
+
+        example 2:
+        list('Service', 'webserver01.domain!ping4')
+
+        example 3:
+        list('Host', attrs='["address", "state"])
+
+        example 4:
+        list('Host', filters='match("webserver*", host.name)')
+        """
+
+        type_conv = {
+            'Host': 'hosts',
+            'Service': 'services',
+            'Notification': 'notifications',
+            'Dependency': 'dependencies',
+            'User': 'users',
+            'Zone': 'zones'}
+        url = '{}/{}'.format(self.root, type_conv[object_type])
 
         payload = {}
         if attrs:
