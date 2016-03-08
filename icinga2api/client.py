@@ -147,35 +147,9 @@ class Objects(Base):
 
     root = '/v1/objects'
 
-    def list(self, object_type, name=None, attrs=None, filters=None, joins=None):
+    def _convert_object_type(self, object_type=None):
         """
-        get object by type or name
-
-        :param object_type: type of the object
-        :type object_type: string
-        :param name: list object with this name
-        :type name: string
-        :param attrs: only return these attributes
-        :type attrs: list
-        :param filters: filter the object list
-        :type filters: string
-        :param joins: show joined object
-        :type joins: list
-
-        example 1:
-        list('Host')
-
-        example 2:
-        list('Service', 'webserver01.domain!ping4')
-
-        example 3:
-        list('Host', attrs='["address", "state"])
-
-        example 4:
-        list('Host', filters='match("webserver*", host.name)')
-
-        example 5:
-        list('Service', joins=['host.name'])
+        check if the object_type is a valid Icinga 2 object type
         """
 
         type_conv = {
@@ -217,9 +191,43 @@ class Objects(Base):
             'Zone': 'zones',
         }
         if not object_type in type_conv:
-            raise Icinga2ApiException('Object type "{}" does not exist.'.format(object_type))
+            raise Icinga2ApiException('Icinga 2 object type "{}" does not exist.'.format(object_type))
 
-        url = '{}/{}'.format(self.root, type_conv[object_type])
+        return type_conv[object_type]
+
+    def list(self, object_type, name=None, attrs=None, filters=None, joins=None):
+        """
+        get object by type or name
+
+        :param object_type: type of the object
+        :type object_type: string
+        :param name: list object with this name
+        :type name: string
+        :param attrs: only return these attributes
+        :type attrs: list
+        :param filters: filter the object list
+        :type filters: string
+        :param joins: show joined object
+        :type joins: list
+
+        example 1:
+        list('Host')
+
+        example 2:
+        list('Service', 'webserver01.domain!ping4')
+
+        example 3:
+        list('Host', attrs='["address", "state"])
+
+        example 4:
+        list('Host', filters='match("webserver*", host.name)')
+
+        example 5:
+        list('Service', joins=['host.name'])
+        """
+
+        url_object_type = self._convert_object_type(object_type)
+        url = '{}/{}'.format(self.root, url_object_type)
         if name:
             url += '/{}'.format(name)
 
@@ -236,20 +244,23 @@ class Objects(Base):
         return self._request('GET', url, payload)
 
     def create(self, object_type, name, config):
-        url = '{}/{}/{}'.format(self.root, object_type, name)
+        url_object_type = self._convert_object_type(object_type)
+        url = '{}/{}/{}'.format(self.root, url_object_type, name)
         return self._request('PUT', url, payload=config)
 
     def update(self, object_type, name, config):
-        url = '{}/{}/{}'.format(self.root, object_type, name)
+        url_object_type = self._convert_object_type(object_type)
+        url = '{}/{}/{}'.format(self.root, url_object_type, name)
         return self._request('POST', url, payload=config)
 
     def delete(self, object_type, name=None, filters=None, cascade=True):
+        url_object_type = self._convert_object_type(object_type)
         if not filters:
             filters = {}
         if cascade:
             filters["cascade"] = 1
 
-        url = '{}/{}'.format(self.root, object_type)
+        url = '{}/{}'.format(self.root, url_object_type)
         if name:
             url += '/{}'.format(name)
         return self._request('DELETE', url, payload=filters)
