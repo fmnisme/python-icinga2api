@@ -147,7 +147,7 @@ class Objects(Base):
 
     root = '/v1/objects'
 
-    def list(self, object_type, name=None, attrs=None, filters=None):
+    def list(self, object_type, name=None, attrs=None, filters=None, joins=None):
         """
         get object by type or name
 
@@ -159,6 +159,8 @@ class Objects(Base):
         :type object_attrs: list
         :param object_filter: filter the object list
         :type object_filter: string
+        :param object_joins: show joined object
+        :type object_filter: list
 
         example 1:
         list('Host')
@@ -171,6 +173,9 @@ class Objects(Base):
 
         example 4:
         list('Host', filters='match("webserver*", host.name)')
+
+        example 4:
+        list('Service', joins='["host.name"]')
         """
 
         type_conv = {
@@ -181,14 +186,19 @@ class Objects(Base):
             'User': 'users',
             'Zone': 'zones'}
         url = '{}/{}'.format(self.root, type_conv[object_type])
+        if name:
+            url += '/{}'.format(name)
 
         payload = {}
         if attrs:
             payload['attrs'] = attrs
         if filters:
             payload['filter'] = filters
-        if name:
-            url += '/{}'.format(name)
+        if isinstance(joins, bool) and joins:
+            payload['all_joins'] = '1'
+        elif joins:
+            payload['joins'] = joins
+
         return self._request('GET', url, payload)
 
     def create(self, object_type, name, config):
