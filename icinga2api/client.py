@@ -248,11 +248,11 @@ class Objects(Base):
 
     def create(self, object_type, name, templates=None, attrs=None):
         """
-        create a object
+        create an object
 
         :param object_type: type of the object
         :type object_type: string
-        :param name: list object with this name
+        :param name: the name of the object
         :type name: string
         :param templates: templates used
         :type templates: list
@@ -280,7 +280,7 @@ class Objects(Base):
 
     def update(self, object_type, name, attrs):
         """
-        update a object
+        update an object
 
         :param object_type: type of the object
         :type object_type: string
