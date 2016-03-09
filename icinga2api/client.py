@@ -301,16 +301,38 @@ class Objects(Base):
         return self._request('POST', url, payload=config)
 
     def delete(self, object_type, name=None, filters=None, cascade=True):
+        """
+        delete an object
+
+        :param object_type: type of the object
+        :type object_type: string
+        :param name: the name of the object
+        :type name: string
+        :param filters: filter the object list
+        :type filters: string
+        :param cascade: deleted dependent objects
+        :type joins: bool
+
+        example 1:
+        delete('Host', 'localhost')
+
+        example 2:
+        delete('Service', filters='match("vhost*", service.name)')
+        """
+
         url_object_type = self._convert_object_type(object_type)
-        if not filters:
-            filters = {}
+
+        config = {}
+        if filters:
+            config['filter'] = filters
         if cascade:
-            filters["cascade"] = 1
+            config["cascade"] = 1
 
         url = '{}/{}'.format(self.root, url_object_type)
         if name:
             url += '/{}'.format(name)
-        return self._request('DELETE', url, payload=filters)
+
+        return self._request('DELETE', url, payload=config)
 
 
 class Actions(Base):
