@@ -101,15 +101,24 @@ class Base(object):
     def _request(self, method='POST', url=None, payload=None):
         '''
         make the request and return the body
+
+        :param method: the HTTP method
+        :type method: string
+        :param url: the requested URL
+        :type url: string
+        :param payload: the payload to send
+        :type payload: dictionary
+        :returns: the response as json
+        :rtype: dictionary
         '''
 
-        LOG.debug("Request URL: {0}".format(url))
+        request_url = urljoin(self.manager.api_endpoint, url)
+        LOG.debug("Request URL: {0}".format(request_url))
 
         # create session
         session = self._create_session(method)
 
         # create arguments for the request
-        request_url = urljoin(self.manager.api_endpoint, url)
         request_args = {
             'url': request_url
         }
