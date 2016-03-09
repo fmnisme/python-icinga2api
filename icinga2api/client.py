@@ -98,7 +98,7 @@ class Base(object):
 
         return session
 
-    def _request(self, method='POST', url=None, payload=None):
+    def _request(self, method, url, payload=None):
         '''
         make the request and return the body
 
