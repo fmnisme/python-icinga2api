@@ -278,9 +278,26 @@ class Objects(Base):
 
         return self._request('PUT', url, payload=config)
 
-    def update(self, object_type, name, config):
+    def update(self, object_type, name, attrs):
+        """
+        update a object
+
+        :param object_type: type of the object
+        :type object_type: string
+        :param name: the name of the object
+        :type name: string
+        :param attrs: object's attributes to change
+        :type attrs: dictionary
+
+        example 1:
+        update('Host', 'localhost', {'address': '127.0.1.1'})
+
+        example 2:
+        update('Service', 'testhost3!dummy', {'check_interval': '10m'})
+        """
         url_object_type = self._convert_object_type(object_type)
         url = '{}/{}/{}'.format(self.root, url_object_type, name)
+
         return self._request('POST', url, payload=config)
 
     def delete(self, object_type, name=None, filters=None, cascade=True):
