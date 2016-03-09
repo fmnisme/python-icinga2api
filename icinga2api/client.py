@@ -268,15 +268,15 @@ class Objects(Base):
 
         url_object_type = self._convert_object_type(object_type)
 
-        config = {}
+        payload = {}
         if attrs:
-            config['attrs'] = attrs
+            payload['attrs'] = attrs
         if templates:
-            config['templates'] = templates
+            payload['templates'] = templates
 
         url = '{}/{}/{}'.format(self.root, url_object_type, name)
 
-        return self._request('PUT', url, payload=config)
+        return self._request('PUT', url, payload)
 
     def update(self, object_type, name, attrs):
         """
@@ -298,7 +298,7 @@ class Objects(Base):
         url_object_type = self._convert_object_type(object_type)
         url = '{}/{}/{}'.format(self.root, url_object_type, name)
 
-        return self._request('POST', url, payload=config)
+        return self._request('POST', url, attrs)
 
     def delete(self, object_type, name=None, filters=None, cascade=True):
         """
@@ -322,17 +322,17 @@ class Objects(Base):
 
         url_object_type = self._convert_object_type(object_type)
 
-        config = {}
+        payload = {}
         if filters:
-            config['filter'] = filters
+            payload['filter'] = filters
         if cascade:
-            config["cascade"] = 1
+            payload['cascade'] = 1
 
         url = '{}/{}'.format(self.root, url_object_type)
         if name:
             url += '/{}'.format(name)
 
-        return self._request('DELETE', url, payload=config)
+        return self._request('DELETE', url, payload)
 
 
 class Actions(Base):
