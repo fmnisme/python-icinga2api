@@ -130,20 +130,21 @@ class Base(object):
             request_args['verify'] = False
 
         # do the request
-        request = session.post(**request_args)
+        response = session.post(**request_args)
 
         session.close()
         from pprint import pprint
         pprint(request_url)
         pprint(payload)
-        pprint(request)
+        pprint(response)
 
-        if not (200 <= request.status_code <=299):
+        if not (200 <= response.status_code <=299):
             raise Icinga2ApiException('Request "{}" failed with status {}: {}'.format(
-                request.url,
-                request.status_code,
-                request.text))
-        return request.json()
+                response.url,
+                response.status_code,
+                response.text))
+
+        return response.json()
 
     # TODO 使用stringIO
     def fetech_from_stream(self, stream, split_str='\n', chunk_size=1024):
