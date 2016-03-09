@@ -123,6 +123,11 @@ class Base(object):
         pprint(payload)
         pprint(request)
 
+        if not (200 < request.status_code <=299):
+            raise Icinga2ApiException('Request "{}" failed with status {}: {}'.format(
+                request.url,
+                request.status_code,
+                request.json()['status']))
         return request.json()
 
     # TODO 使用stringIO
