@@ -8,7 +8,11 @@ write for icinga2 2.4
 from __future__ import print_function
 import logging
 import requests
-from requests.auth import HTTPBasicAuth
+import sys
+if sys.version_info >= (3, 0):
+    from urllib.parse import urljoin
+else:
+    from urlparse import urljoin
 
 import icinga2api
 
@@ -105,8 +109,10 @@ class Base(object):
         session = self._create_session(method)
 
         # create arguments for the request
+        request_url = urljoin(self.manager.api_endpoint, url)
         request_args = {
-            'url': '{}/{}'.format(self.manager.api_endpoint, url)}
+            'url': request_url
+        }
         if payload:
             request_args['json'] = payload
         if self.manager.ca_certificate:
@@ -119,15 +125,15 @@ class Base(object):
 
         session.close()
         from pprint import pprint
-        pprint(url)
+        pprint(request_url)
         pprint(payload)
         pprint(request)
 
-        if not (200 < request.status_code <=299):
+        if not (200 <= request.status_code <=299):
             raise Icinga2ApiException('Request "{}" failed with status {}: {}'.format(
                 request.url,
                 request.status_code,
-                request.json()['status']))
+                request.text))
         return request.json()
 
     # TODO 使用stringIO
