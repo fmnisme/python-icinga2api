@@ -246,9 +246,36 @@ class Objects(Base):
 
         return self._request('GET', url, payload)
 
-    def create(self, object_type, name, config):
+    def create(self, object_type, name, templates=None, attrs=None):
+        """
+        create a object
+
+        :param object_type: type of the object
+        :type object_type: string
+        :param name: list object with this name
+        :type name: string
+        :param templates: templates used
+        :type templates: list
+        :param attrs: object's attributes
+        :type attrs: dictionary
+
+        example 1:
+        create('Host', 'localhost', ['generic-host'], {'address': '127.0.0.1'})
+
+        example 2:
+        create('Service', 'testhost3!dummy', {'check_command': 'dummy'}, ['generic-service'])
+        """
+
         url_object_type = self._convert_object_type(object_type)
+
+        config = {}
+        if attrs:
+            config['attrs'] = attrs
+        if templates:
+            config['templates'] = templates
+
         url = '{}/{}/{}'.format(self.root, url_object_type, name)
+
         return self._request('PUT', url, payload=config)
 
     def update(self, object_type, name, config):
