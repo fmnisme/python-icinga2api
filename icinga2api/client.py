@@ -784,17 +784,24 @@ class Status(Base):
 
     root = "/v1/status"
 
-    def list(self, status_type=None):
-        """Send a GET request to the URL endpoint /v1/status to retrieve status information and statistics for Icinga 2.
-
-        You can limit the output by specifying a status type in the URL, e.g. IcingaApplication.
-
+    def list(self, component=None):
+        """
+        retrieve status information and statistics for Icinga 2
 
         example 1:
-        print list()
+        list()
+
+        example 2:
+        list('IcingaApplication')
+
+        :param component: only list the status of this component
+        :type component: string
+        :returns: status information
+        :rtype: dictionary
         """
+
         url = self.root
-        if status_type:
-            url += "/{}".format(status_type)
+        if component:
+            url += "/{}".format(component)
 
         return self._request('GET', url)
