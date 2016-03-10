@@ -10,14 +10,14 @@ import logging
 import os
 import requests
 import sys
-# pylint: disable=import-error
+# pylint: disable=import-error,no-name-in-module
 if sys.version_info >= (3, 0):
     from urllib.parse import urljoin
     import configparser as configparser
 else:
     from urlparse import urljoin
     import ConfigParser as configparser
-# pylint: enable=import-error
+# pylint: enable=import-error,no-name-in-module
 
 import icinga2api
 
@@ -332,7 +332,8 @@ class Objects(Base):
 
     base_url_path = '/v1/objects'
 
-    def _convert_object_type(self, object_type=None):
+    @staticmethod
+    def _convert_object_type(object_type=None):
         """
         check if the object_type is a valid Icinga 2 object type
         """
