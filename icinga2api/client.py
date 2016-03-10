@@ -10,12 +10,14 @@ import logging
 import os
 import requests
 import sys
+# pylint: disable=import-error
 if sys.version_info >= (3, 0):
     from urllib.parse import urljoin
     import configparser as configparser
 else:
     from urlparse import urljoin
     import ConfigParser as configparser
+# pylint: enable=import-error
 
 import icinga2api
 
@@ -298,7 +300,7 @@ class Base(object):
         pprint(payload)
         pprint(response)
 
-        if not (200 <= response.status_code <=299):
+        if not 200 <= response.status_code <= 299:
             raise Icinga2ApiException('Request "{}" failed with status {}: {}'.format(
                 response.url,
                 response.status_code,
@@ -509,7 +511,7 @@ class Objects(Base):
         if cascade:
             payload['cascade'] = 1
 
-        url = '{}/{}'.format(self.base_url_path, url_object_type)
+        url = '{}/{}'.format(self.base_url_path, object_type_url_path)
         if name:
             url += '/{}'.format(name)
 
