@@ -30,6 +30,7 @@ class Icinga2ApiException(Exception):
     """
 
     def __init__(self, error):
+        super(Icinga2ApiException, self).__init__(error)
         self.error = error
 
     def __str__(self):
@@ -42,6 +43,7 @@ class Icinga2ApiConfigFileException(Exception):
     """
 
     def __init__(self, error):
+        super(Icinga2ApiConfigFileException, self).__init__(error)
         self.error = error
 
     def __str__(self):
