@@ -7,12 +7,15 @@ write for icinga2 2.4
 
 from __future__ import print_function
 import logging
+import os
 import requests
 import sys
 if sys.version_info >= (3, 0):
     from urllib.parse import urljoin
+    import configparser as configparser
 else:
     from urlparse import urljoin
+    import ConfigParser as configparser
 
 import icinga2api
 
@@ -31,26 +34,179 @@ class Icinga2ApiException(Exception):
         return str(self.error)
 
 
+class Icinga2ApiConfigFileException(Exception):
+    """
+    Icinga 2 API config file exception class
+    """
+
+    def __init__(self, error):
+        self.error = error
+
+    def __str__(self):
+        return str(self.error)
+
+
+class ClientConfigFile(object):
+    """
+    Icinga 2 API config file
+    """
+
+    def __init__(self, file_name):
+        """
+        initialization
+        """
+
+        self.file_name = file_name
+        self.section = 'api'
+        self.api_endpoint = None
+        self.username = None
+        self.password = None
+        self.certificate = None
+        self.key = None
+        self.ca_certificate = None
+        self.timeout = None
+        self._check_file_access()
+
+    def _check_file_access(self):
+        """
+        check access to the config file
+
+        :returns: True
+        :rtype: bool
+        """
+
+        if not os.path.exists(self.file_name):
+            raise Icinga2ApiConfigFileException(
+                'Config file "{0}" doesn\'t exist.'.format(
+                    self.file_name
+                )
+            )
+
+        if not os.access(self.file_name, os.R_OK):
+            raise Icinga2ApiConfigFileException(
+                'No read access for config file "{0}".\n'.format(
+                    self.file_name
+                )
+            )
+
+        return True
+
+    def parse(self):
+        """
+        parse the config file
+        """
+
+        cfg = configparser.ConfigParser()
+        cfg.read(self.file_name)
+
+        if not cfg.has_section(self.section):
+            raise Icinga2ApiConfigFileException(
+                'Config file is missing "{0}" section.'.format(
+                    self.section
+                )
+            )
+
+        # [api]/url
+        try:
+            self.api_endpoint = cfg.get(
+                self.section,
+                'api_endpoint'
+            ).strip()
+        except configparser.NoOptionError:
+            pass
+
+        # [api]/username
+        try:
+            self.username = cfg.get(
+                self.section,
+                'username'
+            ).strip()
+        except configparser.NoOptionError:
+            pass
+
+        # [api]/password
+        # do we really want to store the password here
+        # or use the keyring
+        try:
+            self.password = cfg.get(
+                self.section,
+                'password'
+            ).strip()
+        except configparser.NoOptionError:
+            pass
+
+        # [api]/certificate
+        try:
+            self.certificate = cfg.get(
+                self.section,
+                'certificate'
+            ).strip()
+        except configparser.NoOptionError:
+            pass
+
+        # [api]/client_key
+        try:
+            self.key = cfg.get(
+                self.section,
+                'key'
+            ).strip()
+        except configparser.NoOptionError:
+            pass
+
+        # [api]/ca_certificate
+        try:
+            self.ca_certificate = cfg.get(
+                self.section,
+                'ca_certificate'
+            ).strip()
+        except configparser.NoOptionError:
+            pass
+
+        # [api]/timeout
+        try:
+            self.timeout = cfg.get(
+                self.section,
+                'timeout'
+            ).strip()
+        except configparser.NoOptionError:
+            pass
+
+
 class Client(object):
     """
     Icinga 2 Client class
     """
 
     def __init__(self,
-                 api_endpoint,
-                 username,
-                 password,
+                 api_endpoint=None,
+                 username=None,
+                 password=None,
+                 timeout=None,
                  certificate=None,
-                 ca_certificate=None):
+                 key=None,
+                 ca_certificate=None,
+                 config_file=None):
         """
         initialize object
         """
 
-        self.api_endpoint = api_endpoint
-        self.certificate = certificate
-        self.ca_certificate = ca_certificate
-        self.password = password
-        self.username = username
+        if config_file:
+            config_from_file = ClientConfigFile(config_file)
+            config_from_file.parse()
+        self.api_endpoint = api_endpoint or \
+            config_from_file.api_endpoint
+        self.username = username or \
+            config_from_file.username
+        self.password = password or \
+            config_from_file.password
+        self.timeout = timeout or \
+            config_from_file.timeout
+        self.certificate = certificate or \
+            config_from_file.certificate
+        self.key = key or \
+            config_from_file.key
+        self.ca_certificate = ca_certificate or \
+            config_from_file.ca_certificate
         self.objects = Objects(self)
         self.actions = Actions(self)
         self.events = Events(self)
