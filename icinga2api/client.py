@@ -58,7 +58,7 @@ class ClientConfigFile(object):
 
         self.file_name = file_name
         self.section = 'api'
-        self.api_endpoint = None
+        self.url = None
         self.username = None
         self.password = None
         self.certificate = None
@@ -108,9 +108,9 @@ class ClientConfigFile(object):
 
         # [api]/url
         try:
-            self.api_endpoint = cfg.get(
+            self.url = cfg.get(
                 self.section,
-                'api_endpoint'
+                'url'
             ).strip()
         except configparser.NoOptionError:
             pass
@@ -178,7 +178,7 @@ class Client(object):
     """
 
     def __init__(self,
-                 api_endpoint=None,
+                 url=None,
                  username=None,
                  password=None,
                  timeout=None,
@@ -193,8 +193,8 @@ class Client(object):
         if config_file:
             config_from_file = ClientConfigFile(config_file)
             config_from_file.parse()
-        self.api_endpoint = api_endpoint or \
-            config_from_file.api_endpoint
+        self.url = url or \
+            config_from_file.url
         self.username = username or \
             config_from_file.username
         self.password = password or \
@@ -213,13 +213,17 @@ class Client(object):
         self.status = Status(self)
         self.version = icinga2api.__version__
 
+        if not self.url:
+            raise Icinga2ApiException('No "url" defined.')
+        # TODO: do more checking
+
 
 class Base(object):
     """
     Icinga 2 API Base class
     """
 
-    root = None  # 继承
+    base_url_path = None  # 继承
 
     def __init__(self, manager):
         """
@@ -254,21 +258,21 @@ class Base(object):
 
         return session
 
-    def _request(self, method, url, payload=None):
+    def _request(self, method, url_path, payload=None):
         '''
         make the request and return the body
 
         :param method: the HTTP method
         :type method: string
-        :param url: the requested URL
-        :type url: string
+        :param url_path: the requested url path
+        :type url_path: string
         :param payload: the payload to send
         :type payload: dictionary
         :returns: the response as json
         :rtype: dictionary
         '''
 
-        request_url = urljoin(self.manager.api_endpoint, url)
+        request_url = urljoin(self.manager.url, url_path)
         LOG.debug("Request URL: {0}".format(request_url))
 
         # create session
@@ -322,7 +326,7 @@ class Objects(Base):
     Icinga 2 API objects class
     """
 
-    root = '/v1/objects'
+    base_url_path = '/v1/objects'
 
     def _convert_object_type(self, object_type=None):
         """
@@ -406,10 +410,10 @@ class Objects(Base):
         list('Service', joins=True)
         """
 
-        url_object_type = self._convert_object_type(object_type)
-        url = '{}/{}'.format(self.root, url_object_type)
+        object_type_url_path = self._convert_object_type(object_type)
+        url_path = '{}/{}'.format(self.base_url_path, object_type_url_path)
         if name:
-            url += '/{}'.format(name)
+            url_path += '/{}'.format(name)
 
         payload = {}
         if attrs:
@@ -421,7 +425,7 @@ class Objects(Base):
         elif joins:
             payload['joins'] = joins
 
-        return self._request('GET', url, payload)
+        return self._request('GET', url_path, payload)
 
     def create(self, object_type, name, templates=None, attrs=None):
         """
@@ -443,7 +447,7 @@ class Objects(Base):
         create('Service', 'testhost3!dummy', {'check_command': 'dummy'}, ['generic-service'])
         """
 
-        url_object_type = self._convert_object_type(object_type)
+        object_type_url_path = self._convert_object_type(object_type)
 
         payload = {}
         if attrs:
@@ -451,9 +455,9 @@ class Objects(Base):
         if templates:
             payload['templates'] = templates
 
-        url = '{}/{}/{}'.format(self.root, url_object_type, name)
+        url_path = '{}/{}/{}'.format(self.base_url_path, object_type_url_path, name)
 
-        return self._request('PUT', url, payload)
+        return self._request('PUT', url_path, payload)
 
     def update(self, object_type, name, attrs):
         """
@@ -472,10 +476,10 @@ class Objects(Base):
         example 2:
         update('Service', 'testhost3!dummy', {'check_interval': '10m'})
         """
-        url_object_type = self._convert_object_type(object_type)
-        url = '{}/{}/{}'.format(self.root, url_object_type, name)
+        object_type_url_path = self._convert_object_type(object_type)
+        url_path = '{}/{}/{}'.format(self.base_url_path, object_type_url_path, name)
 
-        return self._request('POST', url, attrs)
+        return self._request('POST', url_path, attrs)
 
     def delete(self, object_type, name=None, filters=None, cascade=True):
         """
@@ -497,7 +501,7 @@ class Objects(Base):
         delete('Service', filters='match("vhost*", service.name)')
         """
 
-        url_object_type = self._convert_object_type(object_type)
+        object_type_url_path = self._convert_object_type(object_type)
 
         payload = {}
         if filters:
@@ -505,7 +509,7 @@ class Objects(Base):
         if cascade:
             payload['cascade'] = 1
 
-        url = '{}/{}'.format(self.root, url_object_type)
+        url = '{}/{}'.format(self.base_url_path, url_object_type)
         if name:
             url += '/{}'.format(name)
 
@@ -517,7 +521,7 @@ class Actions(Base):
     Icinga 2 API actions class
     """
 
-    root = '/v1/actions'
+    base_url_path = '/v1/actions'
 
     def process_check_result(self,
                              filters,
@@ -563,7 +567,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "process-check-result")
+        url = '{}/{}'.format(self.base_url_path, "process-check-result")
 
         # payload
         payload = {
@@ -605,7 +609,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "reschedule-check")
+        url = '{}/{}'.format(self.base_url_path, "reschedule-check")
 
         payload = {
             "force_check": force_check
@@ -634,7 +638,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "send-custom-notification")
+        url = '{}/{}'.format(self.base_url_path, "send-custom-notification")
 
         payload = {
             "author": author,
@@ -671,7 +675,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "delay-notification")
+        url = '{}/{}'.format(self.base_url_path, "delay-notification")
 
         payload = {
             "timestamp": timestamp
@@ -694,7 +698,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "acknowledge-problem")
+        url = '{}/{}'.format(self.base_url_path, "acknowledge-problem")
 
         payload = {
             "author": author,
@@ -725,7 +729,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "remove-acknowledgement")
+        url = '{}/{}'.format(self.base_url_path, "remove-acknowledgement")
 
         payload = {}
         payload.update(filters)
@@ -751,7 +755,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "add-comment")
+        url = '{}/{}'.format(self.base_url_path, "add-comment")
 
         payload = {
             "author": author,
@@ -775,7 +779,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "remove-comment")
+        url = '{}/{}'.format(self.base_url_path, "remove-comment")
 
         payload = {}
         payload.update(filters)
@@ -812,7 +816,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "schedule-downtime")
+        url = '{}/{}'.format(self.base_url_path, "schedule-downtime")
 
         payload = {
             "start_time": start_time,
@@ -845,7 +849,7 @@ class Actions(Base):
         """
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.root, "remove-downtime")
+        url = '{}/{}'.format(self.base_url_path, "remove-downtime")
 
         payload = {}
         payload.update(filters)
@@ -860,7 +864,7 @@ class Actions(Base):
         example 1:
         shutdown_process()
         """
-        url = '{}/{}'.format(self.root, "shutdown-process")
+        url = '{}/{}'.format(self.base_url_path, "shutdown-process")
         return self._request('POST', url)
 
     def restart_process(self):
@@ -872,7 +876,7 @@ class Actions(Base):
         example 1:
         restart_process()
         """
-        url = '{}/{}'.format(self.root, "restart-process")
+        url = '{}/{}'.format(self.base_url_path, "restart-process")
         return self._request('POST', url)
 
 
@@ -881,7 +885,7 @@ class Events(Base):
     Icinga 2 API events class
     """
 
-    root = "/v1/events"
+    base_url_path = "/v1/events"
 
     def subscribe(self, types, queue, filters=None):
         """You can subscribe to event streams by sending a POST request to the URL endpoint /v1/events.
@@ -927,7 +931,7 @@ class Events(Base):
         }
         if filters:
             payload["filters"] = filters
-        stream = self._request('POST', self.root, payload, stream=True)
+        stream = self._request('POST', self.base_url_path, payload, stream=True)
         for events in self.fetech_from_stream(stream):   # return list
             for event in events:
                 yield event
@@ -938,7 +942,7 @@ class Status(Base):
     Icinga 2 API status class
     """
 
-    root = "/v1/status"
+    base_url_path = "/v1/status"
 
     def list(self, component=None):
         """
@@ -956,7 +960,7 @@ class Status(Base):
         :rtype: dictionary
         """
 
-        url = self.root
+        url = self.base_url_path
         if component:
             url += "/{}".format(component)
 
