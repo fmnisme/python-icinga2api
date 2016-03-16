@@ -529,53 +529,48 @@ class Actions(Base):
     base_url_path = '/v1/actions'
 
     def process_check_result(self,
-                             filters,
+                             object_type,
+                             name,
                              exit_status,
                              plugin_output,
                              performance_data=None,
                              check_command=None,
                              check_source=None):
-        """Process a check result for a host or a service.
+        """
+        process a check result for a host or a service
 
-        Parameter 	Type 	Description
-        exit_status 	integer 	Required. For services: 0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN, for hosts: 0=OK, 1=CRITICAL.
-        plugin_output 	string 	Required. The plugins main output. Does not contain the performance data.
-        performance_data 	string array 	Optional. The performance data.
-        check_command 	string array 	Optional. The first entry should be the check commands path, then one entry for each command line option followed by an entry for each of its argument.
-        check_source 	string 	Optional. Usually the name of the command_endpoint
-
-        In addition to these parameters a filters must be provided. The valid types for this action are Host and Service.
-
+        :param object_type: Host or Service
+        :type object_type: string
+        :param name: name of the object
+        :type name: string
+        :param exit_status: services: 0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN; hosts: 0=OK, 1=CRITICAL
+        :type filters: integer
+        :param plugin_output: plugins main ouput
+        :type plugin_output: string
+        :param check_command: check command path followed by its arguments
+        :type check_command: list
+        :param check_source: name of the command_endpoint
+        :type check_source: string
 
         expample 1:
-        filters = {
-            "service" : "youfu-zf!ping4"
-        }
-
-        kwargs = { "exit_status": 2,
-                   "plugin_output": "PING CRITICAL - Packet loss = 100%",
-                   "performance_data": [ "rta=5000.000000ms;3000.000000;5000.000000;0.000000", "pl=100%;80;100;0" ],
-                   "check_source": "python client" }
-        process_check_result(filters,**kwargs)
-
-
-        example 1:
-        filters = {
-            "service" : "youfu-zf!ping4"
-        }
-
-        kwargs = { "exit_status": 2,
-                   "plugin_output": "PING CRITICAL - Packet loss = 100%",
-                   "performance_data": [ "rta=5000.000000ms;3000.000000;5000.000000;0.000000", "pl=100%;80;100;0" ],
-                   "check_source": "python client" }
-        process_check_result(filters,**kwargs)
+        process_check_result('Service',
+                             'myhost.domain!ping4',
+                             'exit_status': 2,
+                             'plugin_output': 'PING CRITICAL - Packet loss = 100%',
+                             'performance_data': [
+                                 'rta=5000.000000ms;3000.000000;5000.000000;0.000000',
+                                 'pl=100%;80;100;0'],
+                             'check_source': 'python client'})
         """
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
+
+        if object_type not in ['Host', 'Service']:
+            raise Icinga2ApiException('object_type needs to be "Host" or "Service".')
+
         url = '{}/{}'.format(self.base_url_path, "process-check-result")
 
         # payload
         payload = {
+            '{}'.format(object_type.lower()): name,
             "exit_status": exit_status,
             "plugin_output": plugin_output,
         }
@@ -585,8 +580,8 @@ class Actions(Base):
             payload["check_command"] = check_command
         if check_source:
             payload["check_source"] = check_source
-        payload.update(filters)
-        return self._request('POST', url, payload=payload)
+
+        return self._request('POST', url, payload)
 
     def reschedule_check(self, filters, next_check=None, force_check=True):
         """Reschedule a check for hosts and services. The check can be forced if required.
