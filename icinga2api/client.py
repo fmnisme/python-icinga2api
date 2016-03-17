@@ -772,25 +772,41 @@ class Actions(Base):
 
         return self._request('POST', url, payload)
 
-    def remove_comment(self, filters):
-        '''Remove the comment using its name attribute , returns OK if the comment did not exist. Note: This is not the legacy ID but the comment name returned by Icinga 2 when adding a comment.
-
-        A filter must be provided. The valid types for this action are Host, Service and Comment.
-
+    def remove_comment(self,
+                       object_type,
+                       name,
+                       filters):
+        '''
+        Remove a comment using its name or a filter.
 
         example 1:
-        filters = {
-            "type" : "Service",
-            "filter" : r'service.name=="ping4"'
-        }
-        remove_comment(filters)
-        '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "remove-comment")
+        remove_comment('Comment'
+                       'localhost!localhost-1458202056-25')
 
-        payload = {}
-        payload.update(filters)
+        example 2:
+        remove_comment('Service'
+                       filters='service.name=="ping4"')
+
+        :param object_type: Host, Service or Comment
+        :type object_type: string
+        :param name: name of the Comment
+        :type name: string
+        :param filters: filter the object
+        :type filters: string
+        :returns: the response as json
+        :rtype: dictionary
+        '''
+
+        url = '{}/{}'.format(self.base_url_path, 'remove-comment')
+
+        payload = {
+            'type': object_type
+        }
+        if name:
+            payload[object_type.lower()] = name
+        if filters:
+            payload['filter'] = filters
+
         return self._request('POST', url, payload)
 
     def schedule_downtime(self,
