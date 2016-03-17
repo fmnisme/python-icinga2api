@@ -860,25 +860,44 @@ class Actions(Base):
 
         return self._request('POST', url, payload)
 
-    def remove_downtime(self, filters):
-        '''Remove the downtime using its name attribute , returns OK if the downtime did not exist. Note: This is not the legacy ID but the downtime name returned by Icinga 2 when scheduling a downtime.
-
-        A filter must be provided. The valid types for this action are Host, Service and Downtime.
-
+    def remove_downtime(self,
+                        object_type,
+                        name=None,
+                        filters=None):
+        '''
+        Remove the downtime using its name or a filter.
 
         example 1:
-        filters = {
-            "type" : "Service",
-            "filter" : r'service.name=="ping4"'
-        }
-       remove_comment(filters)
-        '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "remove-downtime")
+        remove_downtime('Downtime',
+                        'localhost!ping4!localhost-1458148978-14')
 
-        payload = {}
-        payload.update(filters)
+        example 2:
+        remove_downtime('Service',
+                        filters='service.name=="ping4"')
+
+        :param object_type: Host, Service or Downtime
+        :type object_type: string
+        :param name: name of the downtime
+        :type name: string
+        :param filters: filter the object
+        :type filters: string
+        :returns: the response as json
+        :rtype: dictionary
+        '''
+
+        if not name and not filters:
+            raise Icinga2ApiException("name and filters is empty or none")
+
+        url = '{}/{}'.format(self.base_url_path, 'remove-downtime')
+
+        payload = {
+            'type': object_type
+        }
+        if name:
+            payload[object_type.lower()] = name
+        if filters:
+            payload['filter'] = filters
+
         return self._request('POST', url, payload)
 
     def shutdown_process(self):
