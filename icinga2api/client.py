@@ -854,9 +854,9 @@ class Actions(Base):
             'duration': duration
         }
         if fixed:
-            payload["fixed"] = fixed
+            payload['fixed'] = fixed
         if trigger_name:
-            payload["trigger_name"] = trigger_name
+            payload['trigger_name'] = trigger_name
 
         return self._request('POST', url, payload)
 
