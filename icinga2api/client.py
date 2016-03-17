@@ -882,15 +882,15 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def shutdown_process(self):
-        '''Shuts down Icinga2. May or may not return.
-
-        This action does not support a target type or filter.
-
+        '''
+        Shuts down Icinga2. May or may not return.
 
         example 1:
         shutdown_process()
         '''
-        url = '{}/{}'.format(self.base_url_path, "shutdown-process")
+
+        url = '{}/{}'.format(self.base_url_path, 'shutdown-process')
+
         return self._request('POST', url)
 
     def restart_process(self):
