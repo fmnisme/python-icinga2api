@@ -735,33 +735,41 @@ class Actions(Base):
         payload.update(filters)
         return self._request('POST', url, payload)
 
-    def add_comment(self, filters, author, comment):
-        '''Adds a comment from an author to services or hosts.
-
-        Parameter 	Type 	Description
-        author 	string 	Required. name of the author, may be empty.
-        comment 	string 	Required. Comment text, may be empty.
-
-        In addition to these parameters a filter must be provided. The valid types for this action are Host and Service.
-
+    def add_comment(self,
+                    object_type,
+                    filters,
+                    author,
+                    comment):
+        '''
+        Add a comment from an author to services or hosts.
 
         example 1:
-        filters = {
-            "type" : "Service",
-            "filter" : r'service.name=="ping4"'
-        }
-        kwargs = { "author": "icingaadmin", "comment": "Troubleticket #123456789 opened." }
-        add_comment(filters,**kwargs)
+        add_comment('Service',
+                    'service.name=="ping4"',
+                    'icingaadmin',
+                    'Incident ticket #12345 opened.')
+
+        :param object_type: Host or Service
+        :type object_type: string
+        :param filters: filter the object
+        :type filters: string
+        :param author: name of the author
+        :type author: string
+        :param comment: comment text
+        :type comment: string
+        :returns: the response as json
+        :rtype: dictionary
         '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "add-comment")
+
+        url = '{}/{}'.format(self.base_url_path, 'add-comment')
 
         payload = {
-            "author": author,
-            "comment": comment
+            'type': object_type,
+            'filter': filters,
+            'author': author,
+            'comment': comment
         }
-        payload.update(filters)
+
         return self._request('POST', url, payload)
 
     def remove_comment(self, filters):
