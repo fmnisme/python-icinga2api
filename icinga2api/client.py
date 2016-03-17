@@ -786,52 +786,78 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def schedule_downtime(self,
+                          object_type,
                           filters,
+                          author,
+                          comment,
                           start_time,
                           end_time,
                           duration,
                           fixed=None,
-                          trigger_name=None,
-                          comment=None,
-                          author=None):
-        """Schedule a downtime for hosts and services.
-
-        Parameter 	Type 	Description
-        start_time 	timestamp 	Required. Timestamp marking the beginning of the downtime.
-        end_time 	timestamp 	Required. Timestamp marking the end of the downtime.
-        duration 	integer 	Required. Duration of the downtime in seconds if fixed is set to false.
-        fixed 	boolean 	Optional. Defaults to false. If true the downtime is fixed otherwise flexible. See downtimes for more information.
-        trigger_name 	string 	Optional. Sets the trigger for a triggered downtime. See downtimes for more information on triggered downtimes.
-
-        In addition to these parameters a filter must be provided. The valid types for this action are Host and Service.
-
+                          trigger_name=None):
+        '''
+        Schedule a downtime for hosts and services.
 
         example 1:
-        filters = {
-            "type" : "Service",
-            "filter" : r'service.name=="ping4"'
+        schedule_downtime(
+            'object_type': 'Service',
+            'filters': r'service.name=="ping4"',
+            'author': 'icingaadmin',
+            'comment': 'IPv4 network maintenance',
+            'start_time': 1446388806,
+            'end_time': 1446389806,
+            'duration': 1000
         }
-        kwargs = { "start_time": 1446388806, "end_time": 1446389806, "duration": 1000, "author": "icingaadmin", "comment": "IPv4 network maintenance" }
-        schedule_downtime(filters,**kwargs)
-        """
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "schedule-downtime")
+
+        example 2:
+        schedule_downtime(
+            'object_type': 'Host',
+            'filters': r'match("*", host.name)',
+            'author': 'icingaadmin',
+            'comment': 'IPv4 network maintenance',
+            'start_time': 1446388806,
+            'end_time': 1446389806,
+            'duration': 1000
+        }
+
+        :param object_type: Host or Service
+        :type object_type: string
+        :param filters: filter the object
+        :type filters: string
+        :param author: name of the author
+        :type author: string
+        :param comment: comment text
+        :type comment: string
+        :param start_time: timestamp marking the beginning
+        :type start_time: string
+        :param end_time: timestamp marking the end
+        :type end_time: string
+        :param duration: duration of the downtime in seconds
+        :type duration: int
+        :param fixed: fixed or flexible downtime
+        :type fixed: bool
+        :param trigger_name: trigger for the downtime
+        :type trigger_name: string
+        :returns: the response as json
+        :rtype: dictionary
+        '''
+
+        url = '{}/{}'.format(self.base_url_path, 'schedule-downtime')
 
         payload = {
-            "start_time": start_time,
-            "end_time": end_time,
-            "duration": duration
+            'type': object_type,
+            'filter': filters,
+            'author': author,
+            'comment': comment,
+            'start_time': start_time,
+            'end_time': end_time,
+            'duration': duration
         }
         if fixed:
             payload["fixed"] = fixed
         if trigger_name:
             payload["trigger_name"] = trigger_name
-        if comment:
-            payload["comment"] = comment
-        if author:
-            payload["author"] = author
-        payload.update(filters)
+
         return self._request('POST', url, payload)
 
     def remove_downtime(self, filters):
