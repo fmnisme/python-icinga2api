@@ -894,15 +894,15 @@ class Actions(Base):
         return self._request('POST', url)
 
     def restart_process(self):
-        '''Restarts Icinga2. May or may not return.
-
-        This action does not support a target type or filter.
-
+        '''
+        Restarts Icinga2. May or may not return.
 
         example 1:
         restart_process()
         '''
-        url = '{}/{}'.format(self.base_url_path, "restart-process")
+
+        url = '{}/{}'.format(self.base_url_path, 'restart-process')
+
         return self._request('POST', url)
 
 
