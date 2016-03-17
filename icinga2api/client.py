@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 icinga2 api client
 
 write for icinga2 2.4
-"""
+'''
 
 from __future__ import print_function
 import logging
@@ -25,9 +25,9 @@ LOG = logging.getLogger(__name__)
 
 
 class Icinga2ApiException(Exception):
-    """
+    '''
     Icinga 2 API exception class
-    """
+    '''
 
     def __init__(self, error):
         super(Icinga2ApiException, self).__init__(error)
@@ -38,9 +38,9 @@ class Icinga2ApiException(Exception):
 
 
 class Icinga2ApiConfigFileException(Exception):
-    """
+    '''
     Icinga 2 API config file exception class
-    """
+    '''
 
     def __init__(self, error):
         super(Icinga2ApiConfigFileException, self).__init__(error)
@@ -51,14 +51,14 @@ class Icinga2ApiConfigFileException(Exception):
 
 
 class ClientConfigFile(object):
-    """
+    '''
     Icinga 2 API config file
-    """
+    '''
 
     def __init__(self, file_name):
-        """
+        '''
         initialization
-        """
+        '''
 
         self.file_name = file_name
         self.section = 'api'
@@ -72,12 +72,12 @@ class ClientConfigFile(object):
         self._check_file_access()
 
     def _check_file_access(self):
-        """
+        '''
         check access to the config file
 
         :returns: True
         :rtype: bool
-        """
+        '''
 
         if not os.path.exists(self.file_name):
             raise Icinga2ApiConfigFileException(
@@ -96,9 +96,9 @@ class ClientConfigFile(object):
         return True
 
     def parse(self):
-        """
+        '''
         parse the config file
-        """
+        '''
 
         cfg = configparser.ConfigParser()
         cfg.read(self.file_name)
@@ -177,9 +177,9 @@ class ClientConfigFile(object):
 
 
 class Client(object):
-    """
+    '''
     Icinga 2 Client class
-    """
+    '''
 
     def __init__(self,
                  url=None,
@@ -190,9 +190,9 @@ class Client(object):
                  key=None,
                  ca_certificate=None,
                  config_file=None):
-        """
+        '''
         initialize object
-        """
+        '''
 
         if config_file:
             config_from_file = ClientConfigFile(config_file)
@@ -223,16 +223,16 @@ class Client(object):
 
 
 class Base(object):
-    """
+    '''
     Icinga 2 API Base class
-    """
+    '''
 
     base_url_path = None  # 继承
 
     def __init__(self, manager):
-        """
+        '''
         initialize object
-        """
+        '''
 
         self.manager = manager
         self.stream_cache = ""
@@ -312,11 +312,11 @@ class Base(object):
 
     # TODO 使用stringIO
     def fetech_from_stream(self, stream, split_str='\n', chunk_size=1024):
-        """将stream中的多个chunk合并,并返回其中完整的数据
+        '''将stream中的多个chunk合并,并返回其中完整的数据
         :param split: 每条数据之间的分隔符
         :param chunk_size: byte
         :return:
-        """
+        '''
         for chunk in stream(chunk_size):
             self.stream_cache += chunk
             lines = self.stream_cache.split(split_str)
@@ -326,17 +326,17 @@ class Base(object):
 
 
 class Objects(Base):
-    """
+    '''
     Icinga 2 API objects class
-    """
+    '''
 
     base_url_path = '/v1/objects'
 
     @staticmethod
     def _convert_object_type(object_type=None):
-        """
+        '''
         check if the object_type is a valid Icinga 2 object type
-        """
+        '''
 
         type_conv = {
             'ApiListener': 'apilisteners',
@@ -382,7 +382,7 @@ class Objects(Base):
         return type_conv[object_type]
 
     def list(self, object_type, name=None, attrs=None, filters=None, joins=None):
-        """
+        '''
         get object by type or name
 
         :param object_type: type of the object
@@ -413,7 +413,7 @@ class Objects(Base):
 
         example 6:
         list('Service', joins=True)
-        """
+        '''
 
         object_type_url_path = self._convert_object_type(object_type)
         url_path = '{}/{}'.format(self.base_url_path, object_type_url_path)
@@ -433,7 +433,7 @@ class Objects(Base):
         return self._request('GET', url_path, payload)
 
     def create(self, object_type, name, templates=None, attrs=None):
-        """
+        '''
         create an object
 
         :param object_type: type of the object
@@ -450,7 +450,7 @@ class Objects(Base):
 
         example 2:
         create('Service', 'testhost3!dummy', {'check_command': 'dummy'}, ['generic-service'])
-        """
+        '''
 
         object_type_url_path = self._convert_object_type(object_type)
 
@@ -465,7 +465,7 @@ class Objects(Base):
         return self._request('PUT', url_path, payload)
 
     def update(self, object_type, name, attrs):
-        """
+        '''
         update an object
 
         :param object_type: type of the object
@@ -480,14 +480,14 @@ class Objects(Base):
 
         example 2:
         update('Service', 'testhost3!dummy', {'check_interval': '10m'})
-        """
+        '''
         object_type_url_path = self._convert_object_type(object_type)
         url_path = '{}/{}/{}'.format(self.base_url_path, object_type_url_path, name)
 
         return self._request('POST', url_path, attrs)
 
     def delete(self, object_type, name=None, filters=None, cascade=True):
-        """
+        '''
         delete an object
 
         :param object_type: type of the object
@@ -504,7 +504,7 @@ class Objects(Base):
 
         example 2:
         delete('Service', filters='match("vhost*", service.name)')
-        """
+        '''
 
         object_type_url_path = self._convert_object_type(object_type)
 
@@ -522,9 +522,9 @@ class Objects(Base):
 
 
 class Actions(Base):
-    """
+    '''
     Icinga 2 API actions class
-    """
+    '''
 
     base_url_path = '/v1/actions'
 
@@ -536,7 +536,7 @@ class Actions(Base):
                              performance_data=None,
                              check_command=None,
                              check_source=None):
-        """
+        '''
         process a check result for a host or a service
 
         :param object_type: Host or Service
@@ -561,7 +561,7 @@ class Actions(Base):
                                  'rta=5000.000000ms;3000.000000;5000.000000;0.000000',
                                  'pl=100%;80;100;0'],
                              'check_source': 'python client'})
-        """
+        '''
 
         if object_type not in ['Host', 'Service']:
             raise Icinga2ApiException('object_type needs to be "Host" or "Service".')
@@ -584,7 +584,7 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def reschedule_check(self, filters, next_check=None, force_check=True):
-        """Reschedule a check for hosts and services. The check can be forced if required.
+        '''Reschedule a check for hosts and services. The check can be forced if required.
 
         Parameter 	Type 	Description
         next_check 	timestamp 	Optional. The next check will be run at this time. If omitted the current time is used.
@@ -606,7 +606,7 @@ class Actions(Base):
             "filter": r'host.name=="youfu-zf"',
         }
         reschedule_check(filters)
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "reschedule-check")
@@ -620,7 +620,7 @@ class Actions(Base):
         return self._request('POST', url, payload=payload)
 
     def send_custom_notification(self, filters, author, comment, force=False):
-        """Send a custom notification for hosts and services. This notification type can be forced being sent to all users.
+        '''Send a custom notification for hosts and services. This notification type can be forced being sent to all users.
 
         Parameter 	Type 	Description
         author 	string 	Required. Name of the author, may be empty.
@@ -635,7 +635,7 @@ class Actions(Base):
             "type" : "Host"
         }
         send_custom_notification(filters,'fmnisme',"test comment")
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "send-custom-notification")
@@ -649,7 +649,7 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def delay_notification(self, filters, timestamp):
-        """Delay notifications for a host or a service.
+        '''Delay notifications for a host or a service.
         Note that this will only have an effect if the service stays in the same problem state that it is currently in.
         If the service changes to another state, a new notification may go out before the time you specify in the timestamp argument.
 
@@ -672,7 +672,7 @@ class Actions(Base):
         }
         delay_notification(filters,"1446389894")
 
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "delay-notification")
@@ -684,7 +684,7 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def acknowledge_problem(self, filters, author, comment, expiry=None, sticky=None, notify=None):
-        """Allows you to acknowledge the current problem for hosts or services.
+        '''Allows you to acknowledge the current problem for hosts or services.
         By acknowledging the current problem, future notifications (for the same state if sticky is set to false) are disabled.
 
         Parameter 	Type 	Description
@@ -695,7 +695,7 @@ class Actions(Base):
         notify 	boolean 	Optional. If true a notification will be sent out to contacts to indicate this problem has been acknowledged. The default is false.
 
         In addition to these parameters a filter must be provided. The valid types for this action are Host and Service.
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "acknowledge-problem")
@@ -714,7 +714,7 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def remove_acknowledgement(self, filters):
-        """Removes the acknowledgements for services or hosts. Once the acknowledgement has been removed notifications will be sent out again.
+        '''Removes the acknowledgements for services or hosts. Once the acknowledgement has been removed notifications will be sent out again.
 
         A filter must be provided. The valid types for this action are Host and Service.
 
@@ -726,7 +726,7 @@ class Actions(Base):
             "service.state_type": 1,
         }
         remove_acknowledgement(filters)
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "remove-acknowledgement")
@@ -736,7 +736,7 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def add_comment(self, filters, author, comment):
-        """Adds a comment from an author to services or hosts.
+        '''Adds a comment from an author to services or hosts.
 
         Parameter 	Type 	Description
         author 	string 	Required. name of the author, may be empty.
@@ -752,7 +752,7 @@ class Actions(Base):
         }
         kwargs = { "author": "icingaadmin", "comment": "Troubleticket #123456789 opened." }
         add_comment(filters,**kwargs)
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "add-comment")
@@ -765,7 +765,7 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def remove_comment(self, filters):
-        """Remove the comment using its name attribute , returns OK if the comment did not exist. Note: This is not the legacy ID but the comment name returned by Icinga 2 when adding a comment.
+        '''Remove the comment using its name attribute , returns OK if the comment did not exist. Note: This is not the legacy ID but the comment name returned by Icinga 2 when adding a comment.
 
         A filter must be provided. The valid types for this action are Host, Service and Comment.
 
@@ -776,7 +776,7 @@ class Actions(Base):
             "filter" : r'service.name=="ping4"'
         }
         remove_comment(filters)
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "remove-comment")
@@ -861,7 +861,7 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def remove_downtime(self, filters):
-        """Remove the downtime using its name attribute , returns OK if the downtime did not exist. Note: This is not the legacy ID but the downtime name returned by Icinga 2 when scheduling a downtime.
+        '''Remove the downtime using its name attribute , returns OK if the downtime did not exist. Note: This is not the legacy ID but the downtime name returned by Icinga 2 when scheduling a downtime.
 
         A filter must be provided. The valid types for this action are Host, Service and Downtime.
 
@@ -872,7 +872,7 @@ class Actions(Base):
             "filter" : r'service.name=="ping4"'
         }
        remove_comment(filters)
-        """
+        '''
         if not filters:
             raise Icinga2ApiException("filters is empty or none")
         url = '{}/{}'.format(self.base_url_path, "remove-downtime")
@@ -882,39 +882,39 @@ class Actions(Base):
         return self._request('POST', url, payload)
 
     def shutdown_process(self):
-        """Shuts down Icinga2. May or may not return.
+        '''Shuts down Icinga2. May or may not return.
 
         This action does not support a target type or filter.
 
 
         example 1:
         shutdown_process()
-        """
+        '''
         url = '{}/{}'.format(self.base_url_path, "shutdown-process")
         return self._request('POST', url)
 
     def restart_process(self):
-        """Restarts Icinga2. May or may not return.
+        '''Restarts Icinga2. May or may not return.
 
         This action does not support a target type or filter.
 
 
         example 1:
         restart_process()
-        """
+        '''
         url = '{}/{}'.format(self.base_url_path, "restart-process")
         return self._request('POST', url)
 
 
 class Events(Base):
-    """
+    '''
     Icinga 2 API events class
-    """
+    '''
 
     base_url_path = "/v1/events"
 
     def subscribe(self, types, queue, filters=None):
-        """You can subscribe to event streams by sending a POST request to the URL endpoint /v1/events.
+        '''You can subscribe to event streams by sending a POST request to the URL endpoint /v1/events.
 
         The following parameters need to be specified (either as URL parameters or in a JSON-encoded message body):
         Parameter 	Type 	Description
@@ -950,7 +950,7 @@ class Events(Base):
         :param queue:
         :param filters:
         :return:
-        """
+        '''
         payload = {
             "types": types,
             "queue": queue,
@@ -964,14 +964,14 @@ class Events(Base):
 
 
 class Status(Base):
-    """
+    '''
     Icinga 2 API status class
-    """
+    '''
 
     base_url_path = "/v1/status"
 
     def list(self, component=None):
-        """
+        '''
         retrieve status information and statistics for Icinga 2
 
         example 1:
@@ -984,7 +984,7 @@ class Status(Base):
         :type component: string
         :returns: status information
         :rtype: dictionary
-        """
+        '''
 
         url = self.base_url_path
         if component:
