@@ -583,41 +583,46 @@ class Actions(Base):
 
         return self._request('POST', url, payload)
 
-    def reschedule_check(self, filters, next_check=None, force_check=True):
-        '''Reschedule a check for hosts and services. The check can be forced if required.
-
-        Parameter 	Type 	Description
-        next_check 	timestamp 	Optional. The next check will be run at this time. If omitted the current time is used.
-        force_check 	boolean 	Optional. Defaults to false. If enabled the checks are executed regardless of time period restrictions and checks being disabled per object or on a global basis.
-
-        In addition to these parameters a filter must be provided. The valid types for this action are Host and Service.
-
+    def reschedule_check(self,
+                         object_type,
+                         filters,
+                         next_check=None,
+                         force_check=True):
+        '''
+        Reschedule a check for hosts and services.
 
         example 1:
-        filters = {
-            "type" : "Service",
-            "filter": r'service.name=="ping4"',
-        }
-        reschedule_check(filters)
+        reschedule_check('Service'
+                         'service.name=="ping4")
 
         example 2:
-        filters = {
-            "type" : "Host",
-            "filter": r'host.name=="youfu-zf"',
-        }
-        reschedule_check(filters)
+        reschedule_check('Host',
+                         'host.name=="localhost"',
+                         '1577833200')
+
+        :param object_type: Host or Service
+        :type object_type: string
+        :param filters: filter the object
+        :type filters: string
+        :param next_check: timestamp to run the check
+        :type next_check: string
+        :param force: ignore period restrictions and disabled checks
+        :type force: bool
+        :returns: the response as json
+        :rtype: dictionary
         '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "reschedule-check")
+
+        url = '{}/{}'.format(self.base_url_path, 'reschedule-check')
 
         payload = {
-            "force_check": force_check
+            'type': object_type,
+            'filter': filters,
+            'force_check': force_check
         }
         if next_check:
-            payload["next_check"] = next_check
-        payload.update(filters)
-        return self._request('POST', url, payload=payload)
+            payload['next_check'] = next_check
+
+        return self._request('POST', url, payload)
 
     def send_custom_notification(self,
                                  object_type,
