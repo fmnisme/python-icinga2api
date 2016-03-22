@@ -683,34 +683,49 @@ class Actions(Base):
         payload.update(filters)
         return self._request('POST', url, payload)
 
-    def acknowledge_problem(self, filters, author, comment, expiry=None, sticky=None, notify=None):
-        '''Allows you to acknowledge the current problem for hosts or services.
-        By acknowledging the current problem, future notifications (for the same state if sticky is set to false) are disabled.
-
-        Parameter 	Type 	Description
-        author 	string 	Required. Name of the author, may be empty.
-        comment 	string 	Required. Comment text, may be empty.
-        expiry 	timestamp 	Optional. If set the acknowledgement will vanish after this timestamp.
-        sticky 	boolean 	Optional. If true, the default, the acknowledgement will remain until the service or host fully recovers.
-        notify 	boolean 	Optional. If true a notification will be sent out to contacts to indicate this problem has been acknowledged. The default is false.
-
-        In addition to these parameters a filter must be provided. The valid types for this action are Host and Service.
+    def acknowledge_problem(self,
+                            object_type,
+                            filters,
+                            author,
+                            comment,
+                            expiry=None,
+                            sticky=None,
+                            notify=None):
         '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
+        Acknowledge a Service or Host problem.
+
+        :param object_type: Host or Service
+        :type object_type: string
+        :param filters: filter the object
+        :type filters: string
+        :param author: name of the author
+        :type author: string
+        :param comment: comment text
+        :type comment: string
+        :param expiry: acknowledgement expiry timestamp
+        :type expiry: int
+        :param sticky: stay till full problem recovery
+        :type sticky: bool
+        :param notify: send notification
+        :type notify: string
+        :returns: the response as json
+        :rtype: dictionary
+        '''
         url = '{}/{}'.format(self.base_url_path, "acknowledge-problem")
 
         payload = {
-            "author": author,
-            "comment": comment,
+            'type': object_type,
+            'filter': filters,
+            'author': author,
+            'comment': comment,
         }
         if expiry:
-            payload["expiry"] = expiry
+            payload['expiry'] = expiry
         if sticky:
-            payload["sticky"] = sticky
+            payload['sticky'] = sticky
         if notify:
-            payload["notify"] = notify
-        payload.update(filters)
+            payload['notify'] = notify
+
         return self._request('POST', url, payload)
 
     def remove_acknowledgement(self,
