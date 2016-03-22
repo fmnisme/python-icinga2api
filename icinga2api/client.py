@@ -566,20 +566,19 @@ class Actions(Base):
         if object_type not in ['Host', 'Service']:
             raise Icinga2ApiException('object_type needs to be "Host" or "Service".')
 
-        url = '{}/{}'.format(self.base_url_path, "process-check-result")
+        url = '{}/{}'.format(self.base_url_path, 'process-check-result')
 
-        # payload
         payload = {
             '{}'.format(object_type.lower()): name,
-            "exit_status": exit_status,
-            "plugin_output": plugin_output,
+            'exit_status': exit_status,
+            'plugin_output': plugin_output,
         }
         if performance_data:
-            payload["performance_data"] = performance_data
+            payload['performance_data'] = performance_data
         if check_command:
-            payload["check_command"] = check_command
+            payload['check_command'] = check_command
         if check_source:
-            payload["check_source"] = check_source
+            payload['check_source'] = check_source
 
         return self._request('POST', url, payload)
 
