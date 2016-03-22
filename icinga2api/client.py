@@ -619,68 +619,80 @@ class Actions(Base):
         payload.update(filters)
         return self._request('POST', url, payload=payload)
 
-    def send_custom_notification(self, filters, author, comment, force=False):
-        '''Send a custom notification for hosts and services. This notification type can be forced being sent to all users.
-
-        Parameter 	Type 	Description
-        author 	string 	Required. Name of the author, may be empty.
-        comment 	string 	Required. Comment text, may be empty.
-        force 	boolean 	Optional. Default: false. If true, the notification is sent regardless of downtimes or whether notifications are enabled or not.
-
-        In addition to these parameters a filter must be provided. The valid types for this action are Host and Service.
-
+    def send_custom_notification(self,
+                                 object_type,
+                                 filters,
+                                 author,
+                                 comment,
+                                 force=False):
+        '''
+        Send a custom notification for hosts and services.
 
         example 1:
-        filters = {
-            "type" : "Host"
-        }
-        send_custom_notification(filters,'fmnisme',"test comment")
+        send_custom_notification('Host',
+                                 'host.name==localhost',
+                                 'icingaadmin',
+                                 'test comment')
+
+        :param object_type: Host or Service
+        :type object_type: string
+        :param filters: filter the object
+        :type filters: string
+        :param author: name of the author
+        :type author: string
+        :param comment: comment text
+        :type comment: string
+        :param force: ignore downtimes and notification settings
+        :type force: bool
+        :returns: the response as json
+        :rtype: dictionary
         '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "send-custom-notification")
+
+        url = '{}/{}'.format(self.base_url_path, 'send-custom-notification')
 
         payload = {
-            "author": author,
-            "comment": comment,
-            "force": force
+            'type': object_type,
+            'filter': filters,
+            'author': author,
+            'comment': comment,
+            'force': force
         }
-        payload.update(filters)
+
         return self._request('POST', url, payload)
 
-    def delay_notification(self, filters, timestamp):
-        '''Delay notifications for a host or a service.
-        Note that this will only have an effect if the service stays in the same problem state that it is currently in.
-        If the service changes to another state, a new notification may go out before the time you specify in the timestamp argument.
-
-        Parameter 	Type 	Description
-        timestamp 	timestamp 	Required. Delay notifications until this timestamp.
-
-        In addition to these parameters a filter must be provided. The valid types for this action are Host and Service.
-
+    def delay_notification(self,
+                           object_type,
+                           filters,
+                           timestamp):
+        '''
+        Delay notifications for a host or a service.
 
         example 1:
-        filters = {
-            "type" : "Service",
-        }
-        delay_notification(filters,"1446389894")
+        delay_notification('Service',
+                           '1446389894')
 
-        example 2:
-        filters = {
-            "type" : "Host",
-            "filter" : r'host.name=="youfu-zf"'
-        }
-        delay_notification(filters,"1446389894")
+        delay_notification('Host',
+                           'host.name=="localhost"',
+                           '1446389894')
 
+        :param object_type: Host or Service
+        :type object_type: string
+        :param filters: filter the object
+        :type filters: string
+        :param timestamp: timestamp to delay the notifications to
+        :type timestamp: int
+        :returns: the response as json
+        :rtype: dictionary
         '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "delay-notification")
+
+        url = '{}/{}'.format(self.base_url_path, 'delay-notification')
 
         payload = {
-            "timestamp": timestamp
+            'type': object_type,
+            'filter': filters,
+            'timestamp': timestamp
         }
-        payload.update(filters)
+
         return self._request('POST', url, payload)
 
     def acknowledge_problem(self,
@@ -711,7 +723,8 @@ class Actions(Base):
         :returns: the response as json
         :rtype: dictionary
         '''
-        url = '{}/{}'.format(self.base_url_path, "acknowledge-problem")
+
+        url = '{}/{}'.format(self.base_url_path, 'acknowledge-problem')
 
         payload = {
             'type': object_type,
