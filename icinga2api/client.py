@@ -713,26 +713,31 @@ class Actions(Base):
         payload.update(filters)
         return self._request('POST', url, payload)
 
-    def remove_acknowledgement(self, filters):
-        '''Removes the acknowledgements for services or hosts. Once the acknowledgement has been removed notifications will be sent out again.
-
-        A filter must be provided. The valid types for this action are Host and Service.
-
+    def remove_acknowledgement(self,
+                               object_type,
+                               filters):
+        '''
+        Remove the acknowledgement for services or hosts.
 
         example 1:
-        filters = {
-            "type" : "Service",
-            "filter" : r'service.state==2',
-            "service.state_type": 1,
-        }
-        remove_acknowledgement(filters)
-        '''
-        if not filters:
-            raise Icinga2ApiException("filters is empty or none")
-        url = '{}/{}'.format(self.base_url_path, "remove-acknowledgement")
+        remove_acknowledgement(object_type='Service',
+                               'service.state==2')
 
-        payload = {}
-        payload.update(filters)
+        :param object_type: Host or Service
+        :type object_type: string
+        :param filters: filter the object
+        :type filters: string
+        :returns: the response as json
+        :rtype: dictionary
+        '''
+
+        url = '{}/{}'.format(self.base_url_path, 'remove-acknowledgement')
+
+        payload = {
+            'type': object_type,
+            'filter': filters
+        }
+
         return self._request('POST', url, payload)
 
     def add_comment(self,
