@@ -262,7 +262,7 @@ class Base(object):
 
         return session
 
-    def _request(self, method, url_path, payload=None):
+    def _request(self, method, url_path, payload=None, stream=False):
         '''
         make the request and return the body
 
@@ -292,11 +292,14 @@ class Base(object):
             request_args['verify'] = self.manager.ca_certificate
         else:
             request_args['verify'] = False
+        if stream:
+            request_args['stream'] = True
 
         # do the request
         response = session.post(**request_args)
 
-        session.close()
+        if not stream:
+            session.close()
         from pprint import pprint
         pprint(request_url)
         pprint(payload)
@@ -308,21 +311,28 @@ class Base(object):
                 response.status_code,
                 response.text))
 
-        return response.json()
+        if stream:
+            return response
+        else:
+            return response.json()
 
-    # TODO 使用stringIO
-    def fetech_from_stream(self, stream, split_str='\n', chunk_size=1024):
-        '''将stream中的多个chunk合并,并返回其中完整的数据
-        :param split: 每条数据之间的分隔符
-        :param chunk_size: byte
-        :return:
+    def _get_message_from_stream(self, stream):
         '''
-        for chunk in stream(chunk_size):
-            self.stream_cache += chunk
-            lines = self.stream_cache.split(split_str)
-            if len(lines) >= 2:
-                self.stream_cache = lines[-1]  # 保留最后一行,他可能是不完整的.
-                yield lines[:-1]
+        make the request and return the body
+
+        :param stream: the stream
+        :type method: request
+        :returns: the message
+        :rtype: dictionary
+        '''
+
+        message = ''
+        for char in stream.iter_content():
+            if char == '\n':
+                yield message
+                message = ''
+            else:
+                message += char
 
 
 class Objects(Base):
@@ -537,7 +547,7 @@ class Actions(Base):
                              check_command=None,
                              check_source=None):
         '''
-        process a check result for a host or a service
+        Process a check result for a host or a service.
 
         :param object_type: Host or Service
         :type object_type: string
@@ -551,6 +561,8 @@ class Actions(Base):
         :type check_command: list
         :param check_source: name of the command_endpoint
         :type check_source: string
+        :returns: the response as json
+        :rtype: dictionary
 
         expample 1:
         process_check_result('Service',
@@ -994,42 +1006,24 @@ class Events(Base):
     base_url_path = "/v1/events"
 
     def subscribe(self, types, queue, filters=None):
-        '''You can subscribe to event streams by sending a POST request to the URL endpoint /v1/events.
-
-        The following parameters need to be specified (either as URL parameters or in a JSON-encoded message body):
-        Parameter 	Type 	Description
-        types 	string array 	Required. Event type(s). Multiple types as URL parameters are supported.
-        queue 	string 	Required. Unique queue name. Multiple HTTP clients can use the same queue as long as they use the same event types and filter.
-        filter 	string 	Optional. Filter for specific event attributes using filter expressions.
-
-        Event Stream Types
-
-        The following event stream types are available:
-        Type 	Description
-        CheckResult 	Check results for hosts and services.
-        StateChange 	Host/service state changes.
-        Notification 	Notification events including notified users for hosts and services.
-        AcknowledgementSet 	Acknowledgement set on hosts and services.
-        AcknowledgementCleared 	Acknowledgement cleared on hosts and services.
-        CommentAdded 	Comment added for hosts and services.
-        CommentRemoved 	Comment removed for hosts and services.
-        DowntimeAdded 	Downtime added for hosts and services.
-        DowntimeRemoved 	Downtime removed for hosts and services.
-        DowntimeTriggered 	Downtime triggered for hosts and services.
-
-        Note: Each type requires API permissions being set.
-
+        '''
+        subscribe to an event stream
 
         example 1:
         types = ["CheckResult"]
-        queue = "michi"
+        queue = "monitor"
         filters = "event.check_result.exit_status==2"
-        for event in subscribe(types,queue,filters):
+        for event in subscribe(types, queue, filters):
             print event
-        :param types:
-        :param queue:
-        :param filters:
-        :return:
+
+        :param types: the event types to return
+        :type types: array
+        :param queue: the queue name to subscribe to
+        :type queue: string
+        :param filters: additional filters to apply
+        :type filters: dictionary
+        :returns: the events
+        :rtype: string
         '''
         payload = {
             "types": types,
@@ -1037,10 +1031,10 @@ class Events(Base):
         }
         if filters:
             payload["filters"] = filters
+
         stream = self._request('POST', self.base_url_path, payload, stream=True)
-        for events in self.fetech_from_stream(stream):   # return list
-            for event in events:
-                yield event
+        for event in self._get_message_from_stream(stream):
+            yield event
 
 
 class Status(Base):
