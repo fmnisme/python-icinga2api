@@ -2,7 +2,7 @@
 """
 icinga2 api client
 
-write for icinga2 2.4
+written for icinga2 2.4 API
 """
 import logging
 import requests
@@ -32,7 +32,7 @@ class Client(object):
 
 
 class Base(object):
-    root = None #继承
+    root = None #inherits
 
     def __init__(self,manager):
         self.manager = manager
@@ -43,7 +43,7 @@ class Base(object):
             "Accept": "application/json",
         }
 
-        #request参数
+        #request parameters
         kwargs = {
             "headers" : headers,
             "auth" : HTTPBasicAuth(self.manager.username, self.manager.password),
@@ -55,8 +55,6 @@ class Base(object):
         else:
             kwargs["json"] = payload
 
-        print url
-        print kwargs
         request_method = getattr(requests,method)
         response = request_method(self.manager.api_endpoint+url, **kwargs)
         if not (200 <= response.status_code <=299):
@@ -67,10 +65,10 @@ class Base(object):
         else:
             return response.json()
 
-    #TODO 使用stringIO
-    def fetech_from_stream(self,stream,split_str='\n',chunk_size=1024):
-        """将stream中的多个chunk合并,并返回其中完整的数据
-        :param split: 每条数据之间的分隔符
+    #TODO use stringIO
+    def fetch_from_stream(self,stream,split_str='\n',chunk_size=1024):
+        """multiple chunk are merged and return full data
+        :param split: Data separator
         :param chunk_size: byte
         :return:
         """
@@ -505,7 +503,7 @@ class Events(Base):
         if filters:
             payload["filters"] = filters
         stream = self.request('post',self.root,payload,stream=True)
-        for events in self.fetech_from_stream(stream):   #return list
+        for events in self.fetch_from_stream(stream):   #return list
             for event in events:
                 yield event
 
