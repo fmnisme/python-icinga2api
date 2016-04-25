@@ -69,7 +69,8 @@ class ClientConfigFile(object):
         self.key = None
         self.ca_certificate = None
         self.timeout = None
-        self._check_file_access()
+        if self.file_name:
+            self._check_file_access()
 
     def _check_file_access(self):
         '''
@@ -193,9 +194,8 @@ class Client(object):
         '''
         initialize object
         '''
-
+        config_from_file = ClientConfigFile(config_file)
         if config_file:
-            config_from_file = ClientConfigFile(config_file)
             config_from_file.parse()
         self.url = url or \
             config_from_file.url
