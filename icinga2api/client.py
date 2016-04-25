@@ -300,11 +300,11 @@ class Base(object):
 
         if not stream:
             session.close()
-        # for debugging
-        #from pprint import pprint
-        #pprint(request_url)
-        #pprint(payload)
-        #pprint(response)
+        # # for debugging
+        # from pprint import pprint
+        # pprint(request_url)
+        # pprint(payload)
+        # pprint(response)
 
         if not 200 <= response.status_code <= 299:
             raise Icinga2ApiException('Request "{}" failed with status {}: {}'.format(
