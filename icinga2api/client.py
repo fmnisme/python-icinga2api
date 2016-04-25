@@ -427,7 +427,7 @@ class Objects(Base):
         get('Service', 'webserver01.domain!ping4', joins=True)
         '''
 
-        return self.list(object_type, name, attrs, joins=joins)[0]
+        return self.list(object_type, name, attrs, joins=joins)['results'][0]
 
     def list(self,
              object_type,
@@ -483,7 +483,7 @@ class Objects(Base):
         elif joins:
             payload['joins'] = joins
 
-        return self._request('GET', url_path, payload)
+        return self._request('GET', url_path, payload)['results']
 
     def create(self,
                object_type,
