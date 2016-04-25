@@ -387,7 +387,7 @@ class Objects(Base):
             'UserGroup': 'usergroups',
             'Zone': 'zones',
         }
-        if not object_type in type_conv:
+        if object_type not in type_conv:
             raise Icinga2ApiException('Icinga 2 object type "{}" does not exist.'.format(object_type))
 
         return type_conv[object_type]
