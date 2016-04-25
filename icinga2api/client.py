@@ -880,7 +880,7 @@ class Actions(Base):
             'start_time': 1446388806,
             'end_time': 1446389806,
             'duration': 1000
-        }
+        )
 
         example 2:
         schedule_downtime(
@@ -891,7 +891,7 @@ class Actions(Base):
             'start_time': 1446388806,
             'end_time': 1446389806,
             'duration': 1000
-        }
+        )
 
         :param object_type: Host or Service
         :type object_type: string
