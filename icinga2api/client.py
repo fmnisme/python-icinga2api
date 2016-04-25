@@ -307,10 +307,12 @@ class Base(object):
         # pprint(response)
 
         if not 200 <= response.status_code <= 299:
-            raise Icinga2ApiException('Request "{}" failed with status {}: {}'.format(
-                response.url,
-                response.status_code,
-                response.text))
+            raise Icinga2ApiException(
+                'Request "{}" failed with status {}: {}'.format(
+                    response.url,
+                    response.status_code,
+                    response.text,
+                ))
 
         if stream:
             return response
@@ -388,11 +390,18 @@ class Objects(Base):
             'Zone': 'zones',
         }
         if object_type not in type_conv:
-            raise Icinga2ApiException('Icinga 2 object type "{}" does not exist.'.format(object_type))
+            raise Icinga2ApiException(
+                'Icinga 2 object type "{}" does not exist.'.format(
+                    object_type
+                ))
 
         return type_conv[object_type]
 
-    def get(self, object_type, name, attrs=None, joins=None):
+    def get(self,
+            object_type,
+            name,
+            attrs=None,
+            joins=None):
         '''
         get object by type or name
 
@@ -420,7 +429,12 @@ class Objects(Base):
 
         return self.list(object_type, name, attrs, joins=joins)[0]
 
-    def list(self, object_type, name=None, attrs=None, filters=None, joins=None):
+    def list(self,
+             object_type,
+             name=None,
+             attrs=None,
+             filters=None,
+             joins=None):
         '''
         get object by type or name
 
@@ -471,7 +485,11 @@ class Objects(Base):
 
         return self._request('GET', url_path, payload)
 
-    def create(self, object_type, name, templates=None, attrs=None):
+    def create(self,
+               object_type,
+               name,
+               templates=None,
+               attrs=None):
         '''
         create an object
 
@@ -488,7 +506,10 @@ class Objects(Base):
         create('Host', 'localhost', ['generic-host'], {'address': '127.0.0.1'})
 
         example 2:
-        create('Service', 'testhost3!dummy', {'check_command': 'dummy'}, ['generic-service'])
+        create('Service',
+               'testhost3!dummy',
+               {'check_command': 'dummy'},
+               ['generic-service'])
         '''
 
         object_type_url_path = self._convert_object_type(object_type)
@@ -499,11 +520,18 @@ class Objects(Base):
         if templates:
             payload['templates'] = templates
 
-        url_path = '{}/{}/{}'.format(self.base_url_path, object_type_url_path, name)
+        url_path = '{}/{}/{}'.format(
+            self.base_url_path,
+            object_type_url_path,
+            name
+        )
 
         return self._request('PUT', url_path, payload)
 
-    def update(self, object_type, name, attrs):
+    def update(self,
+               object_type,
+               name,
+               attrs):
         '''
         update an object
 
@@ -521,11 +549,19 @@ class Objects(Base):
         update('Service', 'testhost3!dummy', {'check_interval': '10m'})
         '''
         object_type_url_path = self._convert_object_type(object_type)
-        url_path = '{}/{}/{}'.format(self.base_url_path, object_type_url_path, name)
+        url_path = '{}/{}/{}'.format(
+            self.base_url_path,
+            object_type_url_path,
+            name
+        )
 
         return self._request('POST', url_path, attrs)
 
-    def delete(self, object_type, name=None, filters=None, cascade=True):
+    def delete(self,
+               object_type,
+               name=None,
+               filters=None,
+               cascade=True):
         '''
         delete an object
 
@@ -582,7 +618,8 @@ class Actions(Base):
         :type object_type: string
         :param name: name of the object
         :type name: string
-        :param exit_status: services: 0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN; hosts: 0=OK, 1=CRITICAL
+        :param exit_status: services: 0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN;
+                            hosts: 0=OK, 1=CRITICAL
         :type filters: integer
         :param plugin_output: plugins main ouput
         :type plugin_output: string
@@ -605,7 +642,9 @@ class Actions(Base):
         '''
 
         if object_type not in ['Host', 'Service']:
-            raise Icinga2ApiException('object_type needs to be "Host" or "Service".')
+            raise Icinga2ApiException(
+                'object_type needs to be "Host" or "Service".'
+            )
 
         url = '{}/{}'.format(self.base_url_path, 'process-check-result')
 
@@ -1061,7 +1100,12 @@ class Events(Base):
         if filters:
             payload["filters"] = filters
 
-        stream = self._request('POST', self.base_url_path, payload, stream=True)
+        stream = self._request(
+            'POST',
+            self.base_url_path,
+            payload,
+            stream=True
+        )
         for event in self._get_message_from_stream(stream):
             yield event
 
