@@ -392,6 +392,34 @@ class Objects(Base):
 
         return type_conv[object_type]
 
+    def get(self, object_type, name, attrs=None, joins=None):
+        '''
+        get object by type or name
+
+        :param object_type: type of the object
+        :type object_type: string
+        :param name: list object with this name
+        :type name: string
+        :param attrs: only return these attributes
+        :type attrs: list
+        :param joins: show joined object
+        :type joins: list
+
+        example 1:
+        get('Host', 'webserver01.domain')
+
+        example 2:
+        get('Service', 'webserver01.domain!ping4')
+
+        example 3:
+        get('Host', 'webserver01.domain', attrs=["address", "state"])
+
+        example 4:
+        get('Service', 'webserver01.domain!ping4', joins=True)
+        '''
+
+        return self.list(object_type, name, attrs, joins=joins)[0]
+
     def list(self, object_type, name=None, attrs=None, filters=None, joins=None):
         '''
         get object by type or name
