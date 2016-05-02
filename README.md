@@ -17,6 +17,11 @@ client = Client('https://localhost:5665', 'username', 'password')
 ```
 
 ```
+from icinga2api.client import Client
+client = Client('https://localhost:5665', certificate='/etc/ssl/certs/myhostname.crt', key='/etc/ssl/keys/myhostname.key')
+```
+
+```
 client = Client('https://localhost:5665', config_file='/etc/icinga2api')
 ```
 
