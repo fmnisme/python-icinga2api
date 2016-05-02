@@ -219,7 +219,10 @@ class Client(object):
 
         if not self.url:
             raise Icinga2ApiException('No "url" defined.')
-        # TODO: do more checking
+        if not self.username and not self.password and not self.certificate:
+            raise Icinga2ApiException(
+                'Neither username/password nor certificate defined.'
+            )
 
 
 class Base(object):
@@ -244,7 +247,6 @@ class Base(object):
 
         session = requests.Session()
         # prefer certificate authentification
-        # TODO: make it configurable
         if self.manager.certificate and self.manager.key:
             # certificate and key are in different files
             session.cert = (self.manager.certificate, self.manager.key)
@@ -329,6 +331,7 @@ class Base(object):
         :rtype: dictionary
         '''
 
+        # TODO: test iter_lines()
         message = ''
         for char in stream.iter_content():
             if char == '\n':
