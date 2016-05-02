@@ -70,9 +70,9 @@ class ClientConfigFile(object):
         self.ca_certificate = None
         self.timeout = None
         if self.file_name:
-            self._check_file_access()
+            self.check_access()
 
-    def _check_file_access(self):
+    def check_access(self):
         '''
         check access to the config file
 
