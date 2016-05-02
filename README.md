@@ -39,12 +39,12 @@ config = {
     "templates": [ "generic-host" ],
     "attrs": {
         "address": "192.168.1.100",
-        'vars.os': 'Windows',
+        'vars.os': 'linux',
         'vars.services.mysql': {'ports': [3306, 3307]},
-        'zone' : 'Zone1',
+        'zone' : 'berlin',
     }
 }
-print client.objects.create('Host', 'test1', config)
+print(client.objects.create('Host', 'mysqlserver01', config))
 ```
 
 
