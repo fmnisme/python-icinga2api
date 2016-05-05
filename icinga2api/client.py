@@ -9,6 +9,8 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 
+requests.packages.urllib3.disable_warnings()
+
 LOG = logging.getLogger(__name__)
 
 
@@ -525,3 +527,23 @@ class Status(Base):
             url += "/%s" % (status_type)
 
         return self.request('get',url)
+
+
+
+class Config(Base):
+    root = "/v1/config"
+
+    def list_packages(self):
+        pass
+
+    def stage_detail(self):
+        pass
+
+    def upload_config(self):
+        pass
+
+    def config_detail(self):
+        pass
+
+    def delete_stage(self):
+        pass
