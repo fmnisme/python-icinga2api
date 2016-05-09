@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 '''
-icinga2 api client
+Icinga 2 API client
 
-write for icinga2 2.4
+The Icinga 2 API allows you to manage configuration objects and resources in a simple,
+programmatic way using HTTP requests.
 '''
 
 from __future__ import print_function
