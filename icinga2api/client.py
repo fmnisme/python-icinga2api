@@ -431,7 +431,7 @@ class Objects(Base):
         get('Service', 'webserver01.domain!ping4', joins=True)
         '''
 
-        return self.list(object_type, name, attrs, joins=joins)['results'][0]
+        return self.list(object_type, name, attrs, joins=joins)[0]
 
     def list(self,
              object_type,
