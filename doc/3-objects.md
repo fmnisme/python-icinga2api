@@ -38,7 +38,7 @@ To get a list of objects (`Host`, `Service`, ...) use the funtion `objects.list(
   object\_type  | string     | **Required.** The object type to get, e.g. `Host`, `Service`.
   name          | string     | **Optional.** The objects name.
   attrs         | list       | **Optional.** Get only the specified objects attributes.
-  filter        | string     | **Optional.** The filter expression, see LINKTOI2.
+  filter        | string     | **Optional.** The filter expression, see [documentation](http://docs.icinga.org/icinga2/latest/doc/module/icinga2/chapter/icinga2-api#icinga2-api-filters).
   filter\_vars  | dictionary | **Optional.** Variables which are available to your filter expression.
   joins         | bool       | **Optional.** Also get the joined object, e.g. for a `Service` the `Host` object.
 
