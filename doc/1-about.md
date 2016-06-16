@@ -13,4 +13,4 @@ python-icinga2api is a [Python](http://www.python.org) module to interact with t
 
 ## <a id="development-info"></a> Development
 
-The code is based on [fsme...](https://github....). Forking, reporting bugs and sending PRs is very appreciated.
+The code is based on [fmnisme's version](https://github.com/fmnisme/python-icinga2api). Forking, reporting bugs and sending PRs is very appreciated.
