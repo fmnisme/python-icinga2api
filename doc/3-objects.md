@@ -31,14 +31,14 @@ Get service `ping4` of host `webserver01.domain` and the host attributes:
 
 ## <a id="objects-list"></a> objects.list()
 
-To get a list of objects (`Host`, `Service`, ...) use the funtion `objects.list()`. You can use `filters` to ...
+To get a list of objects (`Host`, `Service`, ...) use the funtion `objects.list()`. You can use `filter` to ...
 
   Parameter     | Type      | Description
   --------------|-----------|--------------
   object\_type  | string    | **Required.** The object type to get, e.g. `Host`, `Service`.
   name          | string    | **Optional.** The objects name.
   attrs         | list      | **Optional.** Get only the specified objects attributes.
-  filters       | string    | **Optional.** The filter expression, see LINKTOI2.
+  filter        | string    | **Optional.** The filter expression, see LINKTOI2.
   joins         | bool      | **Optional.** Also get the joined object, e.g. for a `Service` the `Host` object.
 
 Examples:
@@ -53,7 +53,7 @@ Get all hosts but limit attributes to `address` and `state`
 
 Get all hosts which have "webserver" in their host name
 
-    client.objects.list('Host', filters='match("webserver\*", host.name)')
+    client.objects.list('Host', filter='match("webserver\*", host.name)')
 
 Get all services and the joined host name:
 
@@ -125,7 +125,7 @@ Update an object with the specified attributes.
   --------------|-----------|--------------
   object\_type  | string    | **Required.** The object type to get, e.g. `Host`, `Service`.
   name          | string    | **Optional.** The objects name.
-  filters       | string    | **Optional.** Filter expression for matching the objects.
+  filter        | string    | **Optional.** Filter expression for matching the objects.
   cascade       | boolean   | **Optional.** Also delete dependent objects. Defaults to `True`.
 
 Examples:
@@ -136,4 +136,4 @@ Delete the "localhost":
 
 Delete all services matching `vhost\*`:
 
-    client.objects.delete('Service', filters='match("vhost\*", service.name)')
+    client.objects.delete('Service', filter='match("vhost\*", service.name)')

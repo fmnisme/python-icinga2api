@@ -8,13 +8,13 @@ Subscribe to an event stream.
   --------------|-----------|--------------
   types         | list      | **Required.** Event types to subscribe for.
   queue         | string    | **Required.** Unique queue name. A queue can be used by multiple clients.
-  filters       | string    | **Optional.** Filter expression to match the events.
+  filter        | string    | **Optional.** Filter expression to match the events.
 
 Example:
 
     types = ['CheckResult']
     queue = 'monitor'
-    filters = 'event.check_result.exit_status==2'
+    filter = 'event.check_result.exit_status==2'
     
-    for event in client.events.subscribe(types, queue, filters):
+    for event in client.events.subscribe(types, queue, filter):
         print(event)

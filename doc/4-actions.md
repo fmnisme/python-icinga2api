@@ -34,7 +34,7 @@ Reschedule a check.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filters          | string     | **Required.** Filter expression to match the objects.
+  filter           | string     | **Required.** Filter expression to match the objects.
   next\_check      | string     | **Optional.** Timestamp to run the check.
   force\_check     | bool       | **Optional.** Force execution, e.g. ignore period restrictions.
 
@@ -53,7 +53,7 @@ Send a custom notification.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filters          | string     | **Required.** Filter expression to match the objects.
+  filter           | string     | **Required.** Filter expression to match the objects.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
   force            | bool       | **Optional.** Force execution, e.g. ignore downtimes. Default: False.
@@ -74,7 +74,7 @@ Delay a notification.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filters          | string     | **Required.** Filter expression to match the objects.
+  filter           | string     | **Required.** Filter expression to match the objects.
   timestamp        | int        | **Required.** Timestamp to delay the notification to.
 
 Example:
@@ -92,7 +92,7 @@ Acknowledge a problem.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filters          | string     | **Required.** Filter expression to match the objects.
+  filter           | string     | **Required.** Filter expression to match the objects.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
   expiry           | int        | **Optional.** If set the acknowledgement will vanish after this timestamp.
@@ -116,7 +116,7 @@ Remove the acknowledgement for services or hosts.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filters          | string     | **Required.** Filter expression to match the objects.
+  filter           | string     | **Required.** Filter expression to match the objects.
 
 Example:
 
@@ -132,7 +132,7 @@ Add a comment from an author for services or hosts.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filters          | string     | **Required.** Filter expression to match the objects.
+  filter           | string     | **Required.** Filter expression to match the objects.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
 
@@ -153,7 +153,7 @@ Remove a comment using its name or a filter.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for.
   name             | string     | **Optional.** Name of the object.
-  filters          | string     | **Optional.** Filter expression to match the objects.
+  filter           | string     | **Optional.** Filter expression to match the objects.
 
 Examples:
 
@@ -163,7 +163,7 @@ Examples:
 
     client.actions.remove_comment(
         'Service',
-        filters='service.name=="ping4"')
+        filter='service.name=="ping4"')
 
 
 ## <a id="actions-schedule-downtime"></a> actions.schedule\_downtime()
@@ -173,7 +173,7 @@ Schedule a downtime for services or hosts.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filters          | string     | **Required.** Filter expression to match the objects.
+  filter           | string     | **Required.** Filter expression to match the objects.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
   start\_time      | int        | **Required.** Timestamp makring the beginning of the downtime.
@@ -200,9 +200,9 @@ Remove a downtime using its name or a filter.
 
   Parameter        | Type       | Description
   -----------------|------------|--------------
-  object\_type      | string     | **Required.** The object type to process the check result for.
+  object\_type     | string     | **Required.** The object type to process the check result for.
   name             | string     | **Optional.** Name of the object.
-  filters          | string     | **Optional.** Filter expression to match the objects.
+  filter           | string     | **Optional.** Filter expression to match the objects.
 
 Examples:
 
@@ -212,7 +212,7 @@ Examples:
 
     client.actions.remove_downtime(
         'Service',
-        filters='service.name=="ping4"')
+        filter='service.name=="ping4"')
 
 
 ## <a id="actions-shutdown-process"></a> actions.shutdown\_process()
