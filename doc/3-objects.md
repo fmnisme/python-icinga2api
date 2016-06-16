@@ -33,13 +33,14 @@ Get service `ping4` of host `webserver01.domain` and the host attributes:
 
 To get a list of objects (`Host`, `Service`, ...) use the funtion `objects.list()`. You can use `filter` to ...
 
-  Parameter     | Type      | Description
-  --------------|-----------|--------------
-  object\_type  | string    | **Required.** The object type to get, e.g. `Host`, `Service`.
-  name          | string    | **Optional.** The objects name.
-  attrs         | list      | **Optional.** Get only the specified objects attributes.
-  filter        | string    | **Optional.** The filter expression, see LINKTOI2.
-  joins         | bool      | **Optional.** Also get the joined object, e.g. for a `Service` the `Host` object.
+  Parameter     | Type       | Description
+  --------------|------------|--------------
+  object\_type  | string     | **Required.** The object type to get, e.g. `Host`, `Service`.
+  name          | string     | **Optional.** The objects name.
+  attrs         | list       | **Optional.** Get only the specified objects attributes.
+  filter        | string     | **Optional.** The filter expression, see LINKTOI2.
+  filter\_vars  | dictionary | **Optional.** Variables which are available to your filter expression.
+  joins         | bool       | **Optional.** Also get the joined object, e.g. for a `Service` the `Host` object.
 
 Examples:
 
@@ -54,6 +55,14 @@ Get all hosts but limit attributes to `address` and `state`
 Get all hosts which have "webserver" in their host name
 
     client.objects.list('Host', filter='match("webserver\*", host.name)')
+
+Get all services which names start with "vHost" and are assigned to hosts named "webserver\*" using `filter_vars`
+
+    hostname_pattern = 'webserver\*'
+    service_pattern = 'vHost\*'
+    client.objects.list('Service',
+                        filter='match(hpattern, host.name) && match(spattern, service.name)',
+                        filter_vars={'hpattern': hostname_pattern, 'spattern': service_pattern})
 
 Get all services and the joined host name:
 
@@ -121,12 +130,13 @@ Update a service and change the check interval:
 
 Update an object with the specified attributes.
 
-  Parameter     | Type      | Description
-  --------------|-----------|--------------
-  object\_type  | string    | **Required.** The object type to get, e.g. `Host`, `Service`.
-  name          | string    | **Optional.** The objects name.
-  filter        | string    | **Optional.** Filter expression for matching the objects.
-  cascade       | boolean   | **Optional.** Also delete dependent objects. Defaults to `True`.
+  Parameter     | Type       | Description
+  --------------|------------|--------------
+  object\_type  | string     | **Required.** The object type to get, e.g. `Host`, `Service`.
+  name          | string     | **Optional.** The objects name.
+  filter        | string     | **Optional.** Filter expression for matching the objects.
+  filter\_vars  | dictionary | **Optional.** Variables which are available to your filter expression.
+  cascade       | boolean    | **Optional.** Also delete dependent objects. Defaults to `True`.
 
 Examples:
 

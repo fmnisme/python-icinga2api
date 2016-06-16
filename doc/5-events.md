@@ -9,6 +9,7 @@ Subscribe to an event stream.
   types         | list      | **Required.** Event types to subscribe for.
   queue         | string    | **Required.** Unique queue name. A queue can be used by multiple clients.
   filter        | string    | **Optional.** Filter expression to match the events.
+  filter\_vars  | dictionary | **Optional.** Variables which are available to your filter expression.
 
 Example:
 

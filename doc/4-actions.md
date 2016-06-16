@@ -35,6 +35,7 @@ Reschedule a check.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
   filter           | string     | **Required.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   next\_check      | string     | **Optional.** Timestamp to run the check.
   force\_check     | bool       | **Optional.** Force execution, e.g. ignore period restrictions.
 
@@ -54,6 +55,7 @@ Send a custom notification.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
   filter           | string     | **Required.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
   force            | bool       | **Optional.** Force execution, e.g. ignore downtimes. Default: False.
@@ -75,6 +77,7 @@ Delay a notification.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
   filter           | string     | **Required.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   timestamp        | int        | **Required.** Timestamp to delay the notification to.
 
 Example:
@@ -93,6 +96,7 @@ Acknowledge a problem.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
   filter           | string     | **Required.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
   expiry           | int        | **Optional.** If set the acknowledgement will vanish after this timestamp.
@@ -117,6 +121,7 @@ Remove the acknowledgement for services or hosts.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
   filter           | string     | **Required.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
 
 Example:
 
@@ -133,6 +138,7 @@ Add a comment from an author for services or hosts.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
   filter           | string     | **Required.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
 
@@ -154,6 +160,7 @@ Remove a comment using its name or a filter.
   object\_type     | string     | **Required.** The object type to process the check result for.
   name             | string     | **Optional.** Name of the object.
   filter           | string     | **Optional.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
 
 Examples:
 
@@ -174,6 +181,7 @@ Schedule a downtime for services or hosts.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
   filter           | string     | **Required.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
   start\_time      | int        | **Required.** Timestamp makring the beginning of the downtime.
@@ -203,6 +211,7 @@ Remove a downtime using its name or a filter.
   object\_type     | string     | **Required.** The object type to process the check result for.
   name             | string     | **Optional.** Name of the object.
   filter           | string     | **Optional.** Filter expression to match the objects.
+  filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
 
 Examples:
 
