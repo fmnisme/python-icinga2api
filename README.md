@@ -18,4 +18,4 @@ python-icinga2api is a [Python](http://www.python.org) module to interact with t
 
 # Usage
 
-ee the [doc](doc) directory.
+See the [doc](doc) directory.
