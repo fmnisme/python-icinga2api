@@ -4,12 +4,12 @@ python-icinga2api is a [Python](http://www.python.org) module to interact with t
 
 ## <a id="features"></a> Features
 
-1. basic and certificate auth
-1. config file support
-1. objects (zone support)
-1. actions
-1. events
-1. status
+1. [basic and certificate auth](2-authentication.md)
+1. [config file support](2-authentication.md#-config-file)
+1. [objects (zone support)](3-objects.md)
+1. [actions](4-actions.md)
+1. [events](5-events.md)
+1. [status](6-status.md)
 
 ## <a id="development-info"></a> Development
 
