@@ -349,7 +349,7 @@ class Objects(Base):
     Icinga 2 API objects class
     '''
 
-    base_url_path = '/v1/objects'
+    base_url_path = 'v1/objects'
 
     @staticmethod
     def _convert_object_type(object_type=None):
@@ -617,7 +617,7 @@ class Actions(Base):
     Icinga 2 API actions class
     '''
 
-    base_url_path = '/v1/actions'
+    base_url_path = 'v1/actions'
 
     def process_check_result(self,
                              object_type,
@@ -1132,7 +1132,7 @@ class Events(Base):
     Icinga 2 API events class
     '''
 
-    base_url_path = "/v1/events"
+    base_url_path = 'v1/events'
 
     def subscribe(self,
                   types,
@@ -1184,7 +1184,7 @@ class Status(Base):
     Icinga 2 API status class
     '''
 
-    base_url_path = "/v1/status"
+    base_url_path = 'v1/status'
 
     def list(self, component=None):
         '''
