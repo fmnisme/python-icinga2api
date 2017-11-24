@@ -116,19 +116,19 @@ class ClientConfigFile(object):
 
         # [api]/url
         try:
-            self.url = cfg.get(
+            self.url = str(cfg.get(
                 self.section,
                 'url'
-            ).strip()
+            )).strip()
         except configparser.NoOptionError:
             pass
 
         # [api]/username
         try:
-            self.username = cfg.get(
+            self.username = str(cfg.get(
                 self.section,
                 'username'
-            ).strip()
+            )).strip()
         except configparser.NoOptionError:
             pass
 
@@ -136,46 +136,46 @@ class ClientConfigFile(object):
         # do we really want to store the password here
         # or use the keyring
         try:
-            self.password = cfg.get(
+            self.password = str(cfg.get(
                 self.section,
                 'password'
-            ).strip()
+            )).strip()
         except configparser.NoOptionError:
             pass
 
         # [api]/certificate
         try:
-            self.certificate = cfg.get(
+            self.certificate = str(cfg.get(
                 self.section,
                 'certificate'
-            ).strip()
+            )).strip()
         except configparser.NoOptionError:
             pass
 
         # [api]/client_key
         try:
-            self.key = cfg.get(
+            self.key = str(cfg.get(
                 self.section,
                 'key'
-            ).strip()
+            )).strip()
         except configparser.NoOptionError:
             pass
 
         # [api]/ca_certificate
         try:
-            self.ca_certificate = cfg.get(
+            self.ca_certificate = str(cfg.get(
                 self.section,
                 'ca_certificate'
-            ).strip()
+            )).strip()
         except configparser.NoOptionError:
             pass
 
         # [api]/timeout
         try:
-            self.timeout = cfg.get(
+            self.timeout = str(cfg.get(
                 self.section,
                 'timeout'
-            ).strip()
+            )).strip()
         except configparser.NoOptionError:
             pass
 
