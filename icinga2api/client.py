@@ -282,7 +282,7 @@ class Base(object):
         '''
 
         request_url = urljoin(self.manager.url, url_path)
-        LOG.debug("Request URL: {0}".format(request_url))
+        LOG.debug("Request URL: %s", request_url)
 
         # create session
         session = self._create_session(method)
