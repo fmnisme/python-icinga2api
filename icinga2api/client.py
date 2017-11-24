@@ -9,8 +9,8 @@ programmatic way using HTTP requests.
 from __future__ import print_function
 import logging
 import os
-import requests
 import sys
+import requests
 # pylint: disable=import-error,no-name-in-module
 if sys.version_info >= (3, 0):
     from urllib.parse import urljoin
