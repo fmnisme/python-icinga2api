@@ -14,6 +14,7 @@ python-icinga2api is a [Python](http://www.python.org) module to interact with t
 # Developing
 
 1. Code cleanup
+1. Tests
 1. Configuration Management
 
 # Usage
