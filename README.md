@@ -1,6 +1,6 @@
 # <a id="about-icinga2"></a> About python-icinga2api
 
-python-icinga2api is a [Python](http://www.python.org) module to interact with the [Icinga 2 RESTful API](http://docs.icinga.org/icinga2/latest/doc/module/icinga2/chapter/icinga2-api).
+python-icinga2api is a [Python](http://www.python.org) module to interact with the [Icinga 2 RESTful API](https://www.icinga.com/docs/icinga2/latest/doc/12-icinga2-api/).
 
 # Features
 
