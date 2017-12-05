@@ -17,8 +17,6 @@ from icinga2api.exceptions import Icinga2ApiException
 from icinga2api.objects import Objects
 from icinga2api.status import Status
 
-requests.packages.urllib3.disable_warnings()
-
 LOG = logging.getLogger(__name__)
 
 
