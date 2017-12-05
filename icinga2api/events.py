@@ -21,7 +21,7 @@ class Events(Base):
     def subscribe(self,
                   types,
                   queue,
-                  filter=None,
+                  filters=None,
                   filter_vars=None):
         '''
         subscribe to an event stream
@@ -29,17 +29,17 @@ class Events(Base):
         example 1:
         types = ["CheckResult"]
         queue = "monitor"
-        filter = "event.check_result.exit_status==2"
-        for event in subscribe(types, queue, filter):
+        filters = "event.check_result.exit_status==2"
+        for event in subscribe(types, queue, filters):
             print event
 
         :param types: the event types to return
         :type types: array
         :param queue: the queue name to subscribe to
         :type queue: string
-        :param filter: additional filter to apply
-        :type filter: dictionary
-        :param filter_vars: variables used in the filter expression
+        :param filters: filters matched object(s)
+        :type filters: string
+        :param filter_vars: variables used in the filters expression
         :type filter_vars: dict
         :returns: the events
         :rtype: string
@@ -48,8 +48,8 @@ class Events(Base):
             "types": types,
             "queue": queue,
         }
-        if filter:
-            payload["filter"] = filter
+        if filters:
+            payload["filter"] = filters
         if filter_vars:
             payload["filter_vars"] = filter_vars
 

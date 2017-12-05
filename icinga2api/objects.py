@@ -107,7 +107,7 @@ class Objects(Base):
              object_type,
              name=None,
              attrs=None,
-             filter=None,
+             filters=None,
              filter_vars=None,
              joins=None):
         '''
@@ -119,9 +119,9 @@ class Objects(Base):
         :type name: string
         :param attrs: only return these attributes
         :type attrs: list
-        :param filter: filter the object list
-        :type filter: string
-        :param filter_vars: variables used in the filter expression
+        :param filters: filters matched object(s)
+        :type filters: string
+        :param filter_vars: variables used in the filters expression
         :type filter_vars: dict
         :param joins: show joined object
         :type joins: list
@@ -136,7 +136,7 @@ class Objects(Base):
         list('Host', attrs='["address", "state"])
 
         example 4:
-        list('Host', filter='match("webserver*", host.name)')
+        list('Host', filters='match("webserver*", host.name)')
 
         example 5:
         list('Service', joins=['host.name'])
@@ -153,8 +153,8 @@ class Objects(Base):
         payload = {}
         if attrs:
             payload['attrs'] = attrs
-        if filter:
-            payload['filter'] = filter
+        if filters:
+            payload['filter'] = filters
         if filter_vars:
             payload['filter_vars'] = filter_vars
         if isinstance(joins, bool) and joins:
@@ -239,7 +239,7 @@ class Objects(Base):
     def delete(self,
                object_type,
                name=None,
-               filter=None,
+               filters=None,
                filter_vars=None,
                cascade=True):
         '''
@@ -249,9 +249,9 @@ class Objects(Base):
         :type object_type: string
         :param name: the name of the object
         :type name: string
-        :param filter: filter the object list
-        :type filter: string
-        :param filter_vars: variables used in the filter expression
+        :param filters: filters matched object(s)
+        :type filters: string
+        :param filter_vars: variables used in the filters expression
         :type filter_vars: dict
         :param cascade: deleted dependent objects
         :type joins: bool
@@ -260,14 +260,14 @@ class Objects(Base):
         delete('Host', 'localhost')
 
         example 2:
-        delete('Service', filter='match("vhost*", service.name)')
+        delete('Service', filters='match("vhost*", service.name)')
         '''
 
         object_type_url_path = self._convert_object_type(object_type)
 
         payload = {}
-        if filter:
-            payload['filter'] = filter
+        if filters:
+            payload['filter'] = filters
         if filter_vars:
             payload['filter_vars'] = filter_vars
         if cascade:
