@@ -10,12 +10,12 @@ from __future__ import print_function
 import logging
 
 import icinga2api
-from icinga2api.objects import Objects
 from icinga2api.actions import Actions
-from icinga2api.events import Events
-from icinga2api.status import Status
 from icinga2api.configfile import ClientConfigFile
+from icinga2api.events import Events
 from icinga2api.exceptions import Icinga2ApiException
+from icinga2api.objects import Objects
+from icinga2api.status import Status
 
 requests.packages.urllib3.disable_warnings()
 
