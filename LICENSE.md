@@ -1,4 +1,3 @@
-'''
 Copyright 2017 fmnisme@gmail.com
 
 Redistribution and use in source and binary forms, with or without
@@ -21,12 +20,3 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-@author: fmnisme, Tobias von der Krone
-@contact: fmnisme@gmail.com, tobias@vonderkrone.info
-@summary: Python library for the Icinga 2 RESTful API
-'''
-
-__author__ = 'fmnisme, Tobias von der Krone'
-__contact__ = 'fmnisme@gmail.com, tobias@vonderkrone.info'
-__version__ = '0.5.0'

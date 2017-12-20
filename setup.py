@@ -14,7 +14,7 @@ setup(
     description=DESCRIPTION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
-    license="BSD",
+    license="2-Clause BSD",
     url=URL,
     packages=[PACKAGE],
     zip_safe=False,
