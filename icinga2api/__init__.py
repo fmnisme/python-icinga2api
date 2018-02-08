@@ -29,4 +29,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 __author__ = 'fmnisme, Tobias von der Krone'
 __contact__ = 'fmnisme@gmail.com, tobias@vonderkrone.info'
-__version__ = '0.5.0'
+__version__ = '0.6.0'
