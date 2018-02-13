@@ -14,6 +14,7 @@ setup(
     description=DESCRIPTION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
+    install_requires=["requests"],
     keywords="Icinga api",
     license="2-Clause BSD",
     url=URL,
