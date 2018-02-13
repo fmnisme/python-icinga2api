@@ -14,6 +14,7 @@ setup(
     description=DESCRIPTION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
+    keywords="Icinga api",
     license="2-Clause BSD",
     url=URL,
     packages=[PACKAGE],
