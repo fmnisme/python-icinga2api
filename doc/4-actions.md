@@ -125,7 +125,7 @@ Remove the acknowledgement for services or hosts.
 
 Example:
 
-    client.actions.acknowledge_problem(
+    client.actions.remove_acknowledgement(
         'Service',
         'service.state==2')
 
@@ -144,7 +144,7 @@ Add a comment from an author for services or hosts.
 
 Example:
 
-    client.actions.acknowledge_problem(
+    client.actions.add_comment(
         'Service',
         'service.name=="ping4"',
         'icingaadmin',
