@@ -34,7 +34,7 @@ Reschedule a check.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filter           | string     | **Required.** Filter expression to match the objects.
+  filters          | string     | **Required.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   next\_check      | string     | **Optional.** Timestamp to run the check.
   force\_check     | bool       | **Optional.** Force execution, e.g. ignore period restrictions.
@@ -54,7 +54,7 @@ Send a custom notification.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filter           | string     | **Required.** Filter expression to match the objects.
+  filters          | string     | **Required.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
@@ -76,7 +76,7 @@ Delay a notification.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filter           | string     | **Required.** Filter expression to match the objects.
+  filters          | string     | **Required.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   timestamp        | int        | **Required.** Timestamp to delay the notification to.
 
@@ -95,7 +95,7 @@ Acknowledge a problem.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filter           | string     | **Required.** Filter expression to match the objects.
+  filters          | string     | **Required.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
@@ -120,12 +120,12 @@ Remove the acknowledgement for services or hosts.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filter           | string     | **Required.** Filter expression to match the objects.
+  filters          | string     | **Required.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
 
 Example:
 
-    client.actions.acknowledge_problem(
+    client.actions.remove_acknowledgement(
         'Service',
         'service.state==2')
 
@@ -137,14 +137,14 @@ Add a comment from an author for services or hosts.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filter           | string     | **Required.** Filter expression to match the objects.
+  filters          | string     | **Required.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
 
 Example:
 
-    client.actions.acknowledge_problem(
+    client.actions.add_comment(
         'Service',
         'service.name=="ping4"',
         'icingaadmin',
@@ -159,7 +159,7 @@ Remove a comment using its name or a filter.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for.
   name             | string     | **Optional.** Name of the object.
-  filter           | string     | **Optional.** Filter expression to match the objects.
+  filters          | string     | **Optional.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
 
 Examples:
@@ -170,7 +170,7 @@ Examples:
 
     client.actions.remove_comment(
         'Service',
-        filter='service.name=="ping4"')
+        filters='service.name=="ping4"')
 
 
 ## <a id="actions-schedule-downtime"></a> actions.schedule\_downtime()
@@ -180,7 +180,7 @@ Schedule a downtime for services or hosts.
   Parameter        | Type       | Description
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for, `Host` or `Service`.
-  filter           | string     | **Required.** Filter expression to match the objects.
+  filters          | string     | **Required.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
   author           | string     | **Required.** Name of the author.
   comment          | string     | **Required.** Comment text.
@@ -210,7 +210,7 @@ Remove a downtime using its name or a filter.
   -----------------|------------|--------------
   object\_type     | string     | **Required.** The object type to process the check result for.
   name             | string     | **Optional.** Name of the object.
-  filter           | string     | **Optional.** Filter expression to match the objects.
+  filters          | string     | **Optional.** Filter expression to match the objects.
   filter\_vars     | dictionary | **Optional.** Variables which are available to your filter expression.
 
 Examples:
@@ -221,7 +221,7 @@ Examples:
 
     client.actions.remove_downtime(
         'Service',
-        filter='service.name=="ping4"')
+        filters='service.name=="ping4"')
 
 
 ## <a id="actions-shutdown-process"></a> actions.shutdown\_process()
