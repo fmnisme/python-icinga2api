@@ -103,7 +103,8 @@ class Base(object):
 
         # create arguments for the request
         request_args = {
-            'url': request_url
+            'url': request_url,
+            'timeout': self.manager.timeout,
         }
         if payload:
             request_args['json'] = payload
