@@ -158,7 +158,8 @@ class Base(object):
 
         # TODO: test iter_lines()
         message = ''
-        for char in stream.iter_content(decode_unicode=True):
+        for char in stream.iter_content():
+            char = char.decode()
             if char == '\n':
                 yield message
                 message = ''
