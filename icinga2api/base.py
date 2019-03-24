@@ -152,7 +152,7 @@ class Base(object):
 
         # TODO: test iter_lines()
         message = ''
-        for char in stream.iter_content():
+        for char in stream.iter_content(decode_unicode=True):
             if char == '\n':
                 yield message
                 message = ''
