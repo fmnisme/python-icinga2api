@@ -31,9 +31,10 @@ class Icinga2ApiException(Exception):
     Icinga 2 API exception class
     '''
 
-    def __init__(self, error):
+    def __init__(self, error, upstream_error=None):
         super(Icinga2ApiException, self).__init__(error)
         self.error = error
+        self.upstream_error = upstream_error
 
     def __str__(self):
         return str(self.error)
