@@ -52,7 +52,8 @@ class Actions(Base):
                              plugin_output,
                              performance_data=None,
                              check_command=None,
-                             check_source=None):
+                             check_source=None,
+                             ttl=None):
         '''
         Process a check result for a host or a service.
 
@@ -95,12 +96,15 @@ class Actions(Base):
             'exit_status': exit_status,
             'plugin_output': plugin_output,
         }
+
         if performance_data:
             payload['performance_data'] = performance_data
         if check_command:
             payload['check_command'] = check_command
         if check_source:
             payload['check_source'] = check_source
+        if ttl:
+            payload['ttl'] = ttl
 
         return self._request('POST', url, payload)
 
