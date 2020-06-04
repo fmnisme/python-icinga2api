@@ -127,12 +127,18 @@ class Base(object):
         # pprint(response)
 
         if not 200 <= response.status_code <= 299:
+            try:
+                upstream_error=response.json()
+            except ValueError:
+                upstream_error=None
             raise Icinga2ApiException(
                 'Request "{}" failed with status {}: {}'.format(
                     response.url,
                     response.status_code,
                     response.text,
-                ))
+                ),
+                upstream_error=upstream_error,
+            )
 
         if stream:
             return response
@@ -153,6 +159,7 @@ class Base(object):
         # TODO: test iter_lines()
         message = ''
         for char in stream.iter_content():
+            char = char.decode()
             if char == '\n':
                 yield message
                 message = ''
